@@ -1,9 +1,18 @@
-import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-export default function Home() {
+export default async function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-     <h1 className="text-4xl font-bold">PDF Quiz Generator</h1>
+    <div className="flex-1">
+      <Alert>
+        <AlertTitle>
+          <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+            Welcome!
+          </h3>
+        </AlertTitle>
+        <AlertDescription>
+          To proceed, upload a PDF file or select a questionnaire.
+        </AlertDescription>
+      </Alert>
     </div>
   );
 }

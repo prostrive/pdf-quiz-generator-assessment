@@ -1,0 +1,12 @@
+{
+  "type": "string",
+  "question": "string",
+  "options": {
+    "A": "string",
+    "B": "string",
+    "C": "string",
+    "D": "string"
+  },
+  "answer": "string",
+  "explanation": "string"
+}

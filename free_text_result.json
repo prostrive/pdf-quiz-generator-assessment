@@ -1,0 +1,6 @@
+{
+  "question": "string",
+  "answer": "string",
+  "userAnswer": "string",
+  "isCorrect": "boolean"
+}
