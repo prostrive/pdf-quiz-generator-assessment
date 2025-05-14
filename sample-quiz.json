@@ -1,0 +1,32 @@
+[
+	{
+		"question": "What framework is the individual specializing in as a Frontend Engineer?",
+		"choices": ["Angular", "Vue.js", "React", "Svelte"],
+		"correctAnswer": "React"
+	},
+	{
+		"question": "How many years of hands-on experience does the individual have?",
+		"choices": ["1 year", "2 years", "3 years", "4 years"],
+		"correctAnswer": "3 years"
+	},
+	{
+		"question": "Which technology did the individual utilize for optimizing a website for an electric company?",
+		"choices": ["Node.js", "Next.js", "React.js", "GraphQL"],
+		"correctAnswer": "Next.js"
+	},
+	{
+		"question": "What type of projects has the individual worked on?",
+		"choices": [
+			"Mobile applications",
+			"E-commerce platforms",
+			"Desktop applications",
+			"Games"
+		],
+		"correctAnswer": "E-commerce platforms"
+	},
+	{
+		"question": "Where does the individual currently work?",
+		"choices": ["GOODFRONTEND", "TechCorp", "WebSolutions", "NextGenApps"],
+		"correctAnswer": "GOODFRONTEND"
+	}
+]

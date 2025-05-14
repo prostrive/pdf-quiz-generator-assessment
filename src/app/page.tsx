@@ -1,4 +1,12 @@
-import { UploadPDF } from '@/components/ui/uploadPDF'
+'use client'
+
+import dynamic from 'next/dynamic'
+
+const UploadPDF = dynamic(
+	() =>
+		import('@/components/upload-pdf/upload-pdf').then((mod) => mod.UploadPDF),
+	{ ssr: false }
+)
 
 export default function Home() {
 	return (
