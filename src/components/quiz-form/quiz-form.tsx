@@ -7,7 +7,6 @@ import {
 	DialogTitle,
 	DialogClose
 } from '@/components/ui/dialog'
-import * as pdfjsLib from 'pdfjs-dist'
 import { FormSchema } from '@/lib/schema'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -16,11 +15,6 @@ import { useGenerateQuiz } from '@/hooks/useGenerateQuiz'
 import { useSubmitResult } from '@/hooks/useSubmitResult'
 import { QuestionnaireForm } from '@/components/questionnaire/questionnaire'
 import { UploadPDF } from '@/components/upload-pdf/upload-pdf'
-
-pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-	'pdfjs-dist/legacy/build/pdf.worker.min.mjs',
-	import.meta.url
-).toString()
 
 function QuizForm() {
 	const form = useForm({
