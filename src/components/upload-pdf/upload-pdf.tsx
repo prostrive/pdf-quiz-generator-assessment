@@ -11,7 +11,26 @@ import {
 	SelectTrigger,
 	SelectValue
 } from '@/components/ui/select'
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage
+} from '@/components/ui/form'
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogClose
+} from '@/components/ui/dialog'
 import * as pdfjsLib from 'pdfjs-dist'
+import { FormSchema } from '@/lib/schema'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 	'pdfjs-dist/legacy/build/pdf.worker.min.mjs',
@@ -21,7 +40,6 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 type Questionnaire = {
 	question: string
 	choices: string[]
-	correctAnswer: string
 }
 
 function UploadPDF() {
@@ -31,6 +49,18 @@ function UploadPDF() {
 		null
 	)
 	const [isLoading, setIsLoading] = useState(false)
+	const form = useForm({
+		resolver: zodResolver(FormSchema),
+		defaultValues: {
+			answer1: '',
+			answer2: '',
+			answer3: '',
+			answer4: '',
+			answer5: ''
+		}
+	})
+	const [score, setScore] = useState('')
+	const [isOpenModal, setIsOpenModal] = useState(false)
 
 	const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
 		const selectedFile = event.target.files?.[0]
@@ -74,9 +104,10 @@ function UploadPDF() {
 	const handleGenerateQuiz = async (e: FormEvent) => {
 		e.preventDefault()
 
+		setError({ error: false, message: '' })
+
 		try {
 			if (!fullText) {
-				alert('asdfaf')
 				return setError({ error: true, message: 'Please upload a PDF file.' })
 			}
 
@@ -96,7 +127,33 @@ function UploadPDF() {
 		}
 	}
 
-	const handleSubmitResult = async () => {}
+	const handleSubmitResult = async () => {
+		if (!FormSchema.safeParse(form.getValues()).success) {
+			return setError({ error: true, message: 'Please fill up the form' })
+		}
+
+		try {
+			const response = await fetch('/api/submit-quiz', {
+				method: 'POST',
+				body: JSON.stringify({
+					data: {
+						questions: questionnaire?.map((item) => item.question),
+						answers: Object.values(form.getValues()).map((item) => item),
+						context: fullText
+					}
+				})
+			})
+			const data = await response.json()
+			const result = JSON.parse(data.result)
+
+			const score = result.question.filter((item) => item.correct).length
+			setScore(score)
+			setIsOpenModal(true)
+		} catch (err) {
+			console.error(err.message)
+			return setError({ error: true, message: err.message })
+		}
+	}
 
 	return (
 		<div>
@@ -113,47 +170,68 @@ function UploadPDF() {
 				<Button type='submit'>Generate Quiz</Button>
 			</form>
 
+			<Dialog open={isOpenModal} onOpenChange={setIsOpenModal}>
+				<DialogContent>
+					<DialogClose />
+					<DialogHeader>
+						<DialogTitle>Your Score</DialogTitle>
+						<DialogDescription>{score}/5</DialogDescription>
+					</DialogHeader>
+				</DialogContent>
+			</Dialog>
+
 			{isLoading ? (
 				<div>Loading...</div>
 			) : (
-				<form
-					className='flex flex-col gap-6 pt-4'
-					onSubmit={handleSubmitResult}
-				>
-					<ul className='flex flex-col gap-2'>
-						{questionnaire?.map((item, idx) => {
-							const itemNumber = idx + 1
-							return (
-								<li className='flex flex-col gap-2' key={item.question}>
-									<p>
-										<strong>
-											{itemNumber}.) {item.question}
-										</strong>
-									</p>
+				<Form {...form}>
+					<form
+						className='flex flex-col gap-6 pt-4'
+						onSubmit={form.handleSubmit(handleSubmitResult)}
+					>
+						<ul className='flex flex-col gap-2'>
+							{questionnaire?.map((item, idx) => {
+								const itemNumber = idx + 1
+								return (
+									<li className='flex flex-col gap-2' key={item.question}>
+										<FormField
+											control={form.control}
+											name={`answer${itemNumber}`}
+											render={({ field }) => (
+												<FormItem>
+													<FormLabel>
+														{itemNumber}.) {item.question}
+													</FormLabel>
+													<Select
+														onValueChange={field.onChange}
+														value={field.value}
+													>
+														<FormControl>
+															<SelectTrigger>
+																<SelectValue placeholder='Choose the correct answer' />
+															</SelectTrigger>
+														</FormControl>
+														<SelectContent>
+															<SelectGroup>
+																{item.choices?.map((answer) => (
+																	<SelectItem value={answer} key={answer}>
+																		{answer}
+																	</SelectItem>
+																))}
+															</SelectGroup>
+														</SelectContent>
+													</Select>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
+									</li>
+								)
+							})}
+						</ul>
 
-									<Select>
-										<SelectTrigger>
-											<SelectValue placeholder='Choose the correct answer' />
-										</SelectTrigger>
-										<SelectContent>
-											<SelectGroup>
-												{item.choices.map((answer) => {
-													return (
-														<SelectItem value={answer} key={answer}>
-															{answer}
-														</SelectItem>
-													)
-												})}
-											</SelectGroup>
-										</SelectContent>
-									</Select>
-								</li>
-							)
-						})}
-					</ul>
-
-					{questionnaire && <Button type='submit'>Submit</Button>}
-				</form>
+						{questionnaire && <Button type='submit'>Submit</Button>}
+					</form>
+				</Form>
 			)}
 		</div>
 	)

@@ -1,0 +1,7 @@
+# Instructions
+
+Analyze the questions and answers to the context, check if the answers are correct
+from the questions the string array of question and answers are already aligned
+with each other output a JSON containing an array of object called "question" with the value
+of the question itself then "correct" as boolean. Without the "```json" at the beginning of the
+string and "```" at the end of the string.
