@@ -1,0 +1,10 @@
+# Instructions
+
+Create a 5 questions from the input and output it as JSON containing array of objects
+containing the question itself as string, 4 answer choices as an array of
+strings. Without the "```json" at the beginning of the string and "```" at the 
+end of the string. Make it like this ```{
+	question: string
+	choices: string[]
+}```
+
