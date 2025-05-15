@@ -1,4 +1,18 @@
-const useGenerateQuiz = () => {
+import { toast } from 'sonner'
+import { type TextItem } from 'pdfjs-dist/types/src/display/api'
+import { useState, type FormEvent, type ChangeEvent } from 'react'
+import type { Questionnaire, FormValues } from '@/types'
+
+import * as pdfjsLib from 'pdfjs-dist'
+import { type UseFormReturn } from 'react-hook-form'
+
+const useGenerateQuiz = ({ form }: { form: UseFormReturn<FormValues> }) => {
+	const [fullText, setFullText] = useState('')
+	const [questionnaire, setQuestionnaire] = useState<Questionnaire[] | null>(
+		null
+	)
+	const [isLoading, setIsLoading] = useState(false)
+
 	const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
 		const selectedFile = event.target.files?.[0]
 
@@ -36,6 +50,13 @@ const useGenerateQuiz = () => {
 	const handleGenerateQuiz = async (e: FormEvent) => {
 		e.preventDefault()
 		setQuestionnaire(null)
+		form.reset({
+			answer1: '',
+			answer2: '',
+			answer3: '',
+			answer4: '',
+			answer5: ''
+		})
 
 		try {
 			if (!fullText) {
@@ -66,7 +87,13 @@ const useGenerateQuiz = () => {
 		}
 	}
 
-	return { handleGenerateQuiz, handleFileChange }
+	return {
+		handleGenerateQuiz,
+		handleFileChange,
+		fullText,
+		isLoading,
+		questionnaire
+	}
 }
 
 export { useGenerateQuiz }

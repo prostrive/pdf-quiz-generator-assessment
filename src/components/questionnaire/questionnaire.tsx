@@ -1,26 +1,27 @@
 import {
 	Select,
-	SelectTrigger,
-	SelectValue,
 	SelectContent,
 	SelectGroup,
-	SelectItem
-} from '@radix-ui/react-select'
-import { Form, UseFormReturn } from 'react-hook-form'
-import { Button } from '../ui/button'
+	SelectItem,
+	SelectTrigger,
+	SelectValue
+} from '@/components/ui/select'
+import { UseFormReturn } from 'react-hook-form'
+import { Button } from '@/components/ui/button'
 import {
+	Form,
+	FormControl,
 	FormField,
 	FormItem,
 	FormLabel,
-	FormControl,
 	FormMessage
-} from '../ui/form'
-import { type Questionnaire, type FormValues } from '../upload-pdf/upload-pdf'
+} from '@/components/ui/form'
+import type { Questionnaire, FormValues } from '@/types'
 
 type QuestionnaireProps = {
 	form: UseFormReturn<FormValues>
 	handleSubmitResult: () => Promise<string | number | undefined>
-	questionnaire: Questionnaire[]
+	questionnaire?: Questionnaire[] | null
 	isLoading: boolean
 }
 
