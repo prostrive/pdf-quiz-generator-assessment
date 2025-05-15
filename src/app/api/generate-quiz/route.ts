@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
 	} catch (error) {
 		console.error(error)
 		return NextResponse.json(
-			{ message: 'Failed to generate Questionnaire please try again.' },
+			{ message: 'Failed to generate Questionnaire please try again later.' },
 			{
 				status: 500
 			}

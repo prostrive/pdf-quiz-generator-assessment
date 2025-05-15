@@ -22,15 +22,16 @@ import {
 import {
 	Dialog,
 	DialogContent,
-	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 	DialogClose
 } from '@/components/ui/dialog'
 import * as pdfjsLib from 'pdfjs-dist'
 import { FormSchema } from '@/lib/schema'
-import { useForm } from 'react-hook-form'
+import { useForm, UseFormReturn } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { scoreHeading } from '@/lib/utils'
+import { toast } from 'sonner'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 	'pdfjs-dist/legacy/build/pdf.worker.min.mjs',
@@ -42,14 +43,21 @@ type Questionnaire = {
 	choices: string[]
 }
 
+type FormValues = {
+	answer1: string
+	answer2: string
+	answer3: string
+	answer4: string
+	answer5: string
+}
+
 function UploadPDF() {
-	const [error, setError] = useState({ error: false, message: '' })
 	const [fullText, setFullText] = useState('')
 	const [questionnaire, setQuestionnaire] = useState<Questionnaire[] | null>(
 		null
 	)
 	const [isLoading, setIsLoading] = useState(false)
-	const form = useForm({
+	const form = useForm<UseFormReturn<FormValues>>({
 		resolver: zodResolver(FormSchema),
 		defaultValues: {
 			answer1: '',
@@ -59,14 +67,14 @@ function UploadPDF() {
 			answer5: ''
 		}
 	})
-	const [score, setScore] = useState('')
+	const [score, setScore] = useState<number | null>(null)
 	const [isOpenModal, setIsOpenModal] = useState(false)
 
 	const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
 		const selectedFile = event.target.files?.[0]
 
 		if (selectedFile?.type !== 'application/pdf') {
-			return setError({ error: true, message: 'Please upload a PDF file.' })
+			return toast.error('Please upload a PDF file.')
 		}
 
 		const arrayBuffer = await selectedFile.arrayBuffer()
@@ -74,11 +82,8 @@ function UploadPDF() {
 		const pdf = await pdfjsLib.getDocument(typedArray).promise
 		const totalPages = pdf.numPages
 
-		if (totalPages === 10) {
-			return setError({
-				error: true,
-				message: 'PDF file must be 10 pages below.'
-			})
+		if (totalPages >= 10) {
+			return toast.error('PDF file must be 10 pages below.')
 		}
 
 		let fullText = ''
@@ -97,18 +102,15 @@ function UploadPDF() {
 			fullText += `${pageText}\n\n`
 			setFullText(fullText)
 		}
-
-		setError({ error: false, message: '' })
 	}
 
 	const handleGenerateQuiz = async (e: FormEvent) => {
 		e.preventDefault()
-
-		setError({ error: false, message: '' })
+		setQuestionnaire(null)
 
 		try {
 			if (!fullText) {
-				return setError({ error: true, message: 'Please upload a PDF file.' })
+				return toast.error('Please upload a PDF file.')
 			}
 
 			setIsLoading(true)
@@ -117,19 +119,27 @@ function UploadPDF() {
 				body: JSON.stringify({ text: fullText })
 			})
 			const data = await response.json()
+
+			if (!response.ok) {
+				throw new Error(data.message)
+			}
+
 			const questions = JSON.parse(data.result)
 
 			setQuestionnaire(questions.questions)
-			setIsLoading(false)
 		} catch (err) {
-			console.error(err.message)
-			return setError({ error: true, message: err.message })
+			if (err instanceof Error) {
+				return toast.error(err.message)
+			}
+			return toast.error('Something went wrong please try again later.')
+		} finally {
+			setIsLoading(false)
 		}
 	}
 
 	const handleSubmitResult = async () => {
 		if (!FormSchema.safeParse(form.getValues()).success) {
-			return setError({ error: true, message: 'Please fill up the form' })
+			return toast.error('Please fill up the form.')
 		}
 
 		try {
@@ -146,27 +156,38 @@ function UploadPDF() {
 			const data = await response.json()
 			const result = JSON.parse(data.result)
 
-			const score = result.question.filter((item) => item.correct).length
+			if (!response.ok) {
+				throw new Error(data.message)
+			}
+
+			const score = result.question.filter(
+				(item: { correct: boolean }) => item.correct
+			).length
 			setScore(score)
 			setIsOpenModal(true)
-		} catch (err) {
-			console.error(err.message)
-			return setError({ error: true, message: err.message })
+		} catch (err: unknown) {
+			if (err instanceof Error) {
+				return toast.error(err.message)
+			}
+			return toast.error('Something went wrong please try again later.')
 		}
 	}
 
 	return (
-		<div>
-			<form onSubmit={handleGenerateQuiz} className='flex flex-col gap-1'>
+		<div className='w-full flex flex-col items-center justify-center'>
+			<form
+				onSubmit={handleGenerateQuiz}
+				className='flex flex-col gap-1 w-full justify-center max-w-[400]'
+			>
 				<label htmlFor='upload-pdf'>Upload PDF</label>
 				<input
 					className='border-gray-400 border-2 rounded-md p-1 cursor-pointer'
 					type='file'
 					name='upload-pdf'
 					id='upload-pdf'
+					accept='application/pdf'
 					onChange={handleFileChange}
 				/>
-				{error.error && <p className='text-red-700'>{error.message}</p>}
 				<Button type='submit'>Generate Quiz</Button>
 			</form>
 
@@ -174,31 +195,34 @@ function UploadPDF() {
 				<DialogContent>
 					<DialogClose />
 					<DialogHeader>
-						<DialogTitle>Your Score</DialogTitle>
-						<DialogDescription>{score}/5</DialogDescription>
+						<DialogTitle className='text-2xl'>
+							{scoreHeading(score ?? 0)}
+						</DialogTitle>
 					</DialogHeader>
+
+					<p className='text-sm'>{score}/5</p>
 				</DialogContent>
 			</Dialog>
 
-			{isLoading ? (
-				<div>Loading...</div>
-			) : (
-				<Form {...form}>
-					<form
-						className='flex flex-col gap-6 pt-4'
-						onSubmit={form.handleSubmit(handleSubmitResult)}
-					>
-						<ul className='flex flex-col gap-2'>
+			<Form {...form}>
+				<form
+					className='flex flex-col gap-6 pt-10 w-full items-center justify-center h-full max-w-[800]'
+					onSubmit={form.handleSubmit(handleSubmitResult)}
+				>
+					{isLoading ? (
+						<div className='border-4 border-black animate-spin h-10 w-10 rounded-full border-t-transparent' />
+					) : (
+						<ul className='flex flex-col gap-6'>
 							{questionnaire?.map((item, idx) => {
 								const itemNumber = idx + 1
 								return (
 									<li className='flex flex-col gap-2' key={item.question}>
 										<FormField
 											control={form.control}
-											name={`answer${itemNumber}`}
+											name={`answer${itemNumber}` as keyof FormValues}
 											render={({ field }) => (
 												<FormItem>
-													<FormLabel>
+													<FormLabel className='w-full'>
 														{itemNumber}.) {item.question}
 													</FormLabel>
 													<Select
@@ -228,13 +252,17 @@ function UploadPDF() {
 								)
 							})}
 						</ul>
+					)}
 
-						{questionnaire && <Button type='submit'>Submit</Button>}
-					</form>
-				</Form>
-			)}
+					{questionnaire && (
+						<Button disabled={form.formState.isSubmitting} type='submit'>
+							Submit
+						</Button>
+					)}
+				</form>
+			</Form>
 		</div>
 	)
 }
 
-export { UploadPDF }
+export { UploadPDF, type Questionnaire, type FormValues }
