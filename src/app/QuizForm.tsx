@@ -24,30 +24,33 @@ export default function QuizForm({ quiz, onGenerateAgain }: Props) {
       return;
     }
 
+    let newScore = score;
+
+    if (answer === currentQuestion.answer) {
+      newScore++;
+      setScore(newScore);
+    }
+
     const quizLength = quiz.length;
 
     if (questionNumber === quizLength) {
       setShowResults(true);
 
-      if (score === quizLength)
+      if (newScore === quizLength)
         setResultMessage(
           "🎉 Awesome! You got a perfect score! You really understood the material — great job!"
         );
-
-      if (score === 0)
+      else if (newScore === 0)
         setResultMessage(
           `❌ Oops! You scored 0 out of ${quizLength}. It looks like the questions were tricky — try reviewing the document and try again.`
         );
-
-      if (score < quizLength)
+      else if (newScore < quizLength)
         setResultMessage(
           `✅ Nice try! You got ${score} out of ${quizLength} correct. Review the material and give it another shot!`
         );
 
       return;
     }
-
-    if (answer === currentQuestion.answer) setScore(score + 1);
 
     setQuestionNumber(questionNumber + 1);
     setCurrentQuestion(quiz[questionNumber]);
