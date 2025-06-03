@@ -61,7 +61,6 @@ export default function UploadForm({ onGenerate }: Props) {
       return;
     }
 
-    setIsLoading(true);
     setFormError("");
 
     const arrayBuffer = await file.arrayBuffer();
@@ -71,6 +70,8 @@ export default function UploadForm({ onGenerate }: Props) {
       setFormError("PDF must not exceed 10 pages");
       return;
     }
+
+    setIsLoading(true);
 
     // Extract text from all pages
     const textPromises: Promise<string>[] = [];
