@@ -122,26 +122,32 @@ export default function UploadForm({ onGenerate }: Props) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="file"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Choose PDF to generate quiz</FormLabel>
-              <FormControl>
-                <Input
-                  type="file"
-                  accept="application/pdf"
-                  onChange={(e) => field.onChange(e.target.files)}
-                />
-              </FormControl>
-              <FormMessage />
-              {formError && <p className="text-sm text-red-500">{formError}</p>}
-            </FormItem>
-          )}
-        />
+        <div className="flex items-end justify-center gap-2">
+          <FormField
+            control={form.control}
+            name="file"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-md">
+                  Choose PDF to generate quiz
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="file"
+                    accept="application/pdf"
+                    onChange={(e) => field.onChange(e.target.files)}
+                  />
+                </FormControl>
+                <FormMessage />
+                {formError && (
+                  <p className="text-sm text-red-500">{formError}</p>
+                )}
+              </FormItem>
+            )}
+          />
 
-        <Button type="submit">Generate</Button>
+          <Button type="submit">Generate Quiz</Button>
+        </div>
       </form>
     </Form>
   );
