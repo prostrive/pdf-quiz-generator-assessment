@@ -34,8 +34,8 @@ const fileSchema = z.object({
     .refine((v) => v.item(0)?.type === "application/pdf", {
       message: "File must be a PDF",
     })
-    .refine((v) => v.item(0)?.size! <= 10 * 1024 * 1024, {
-      message: "File must be 10MB or less",
+    .refine((v) => v.item(0)?.size! <= 1 * 1024 * 1024, {
+      message: "File must be 1MB or less",
     }),
 });
 
