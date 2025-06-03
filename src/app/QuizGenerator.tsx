@@ -9,7 +9,15 @@ import QuizForm from "./QuizForm";
 export default function QuizGenerator() {
   const [quiz, setQuiz] = useState<QuizQuestion[]>();
 
-  if (quiz) return <QuizForm quiz={quiz} />;
+  if (quiz)
+    return (
+      <QuizForm
+        quiz={quiz}
+        onGenerateAgain={() => {
+          setQuiz(undefined);
+        }}
+      />
+    );
 
   return (
     <UploadForm
