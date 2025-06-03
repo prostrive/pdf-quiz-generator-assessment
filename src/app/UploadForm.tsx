@@ -24,6 +24,7 @@ import {
   generateQuizFromPdfText,
   QuizQuestion,
 } from "@/actions/generateQuestions";
+import { extractKeySections } from "@/lib/utils";
 
 const fileSchema = z.object({
   file: z
@@ -55,7 +56,10 @@ export default function UploadForm({ onGenerate }: Props) {
   const onSubmit = async (values: FileSchema) => {
     const file = values.file.item(0);
 
-    if (!file) return;
+    if (!file) {
+      setFormError("Select PDF File");
+      return;
+    }
 
     setIsLoading(true);
     setFormError("");
@@ -79,18 +83,16 @@ export default function UploadForm({ onGenerate }: Props) {
     }
 
     const pageTexts = await Promise.all(textPromises);
-    const pdfText = pageTexts.join("\n\n");
-
-    console.log("Extracted PDF Text:", pdfText);
+    const pdfText = extractKeySections(pageTexts);
 
     const quiz = await generateQuizFromPdfText(pdfText);
 
-    if (!quiz) return;
+    if (!quiz) {
+      setFormError(
+        "Quiz generation failed. Try a different file or make sure the content is readable."
+      );
 
-    for (const question of quiz) {
-      console.log("QUESTION", question.question);
-      console.log("OPTIONS", question.options);
-      console.log("ANSWER", question.answer);
+      return;
     }
 
     onGenerate(quiz);
