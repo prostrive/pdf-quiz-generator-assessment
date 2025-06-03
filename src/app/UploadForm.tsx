@@ -87,10 +87,34 @@ export default function UploadForm({ onGenerate }: Props) {
 
     if (!quiz) return;
 
+    for (const question of quiz) {
+      console.log("QUESTION", question.question);
+      console.log("OPTIONS", question.options);
+      console.log("ANSWER", question.answer);
+    }
+
     onGenerate(quiz);
 
     setIsLoading(false);
   };
+
+  if (isLoading)
+    return (
+      <div className="flex gap-3 items-center">
+        <p className="text-2xl">Generating Quiz</p>
+        <div className="flex flex-row pl-1 text-4xl">
+          <div className="animate-[bounce_0.7s_ease-in-out_-0.3s_infinite] p-[2px] ">
+            .
+          </div>
+          <div className="animate-[bounce_0.7s_ease-in-out_-0.2s_infinite] p-[2px] ">
+            .
+          </div>
+          <div className="animate-[bounce_0.7s_ease-in-out_-0.1s_infinite] p-[2px] ">
+            .
+          </div>
+        </div>
+      </div>
+    );
 
   return (
     <Form {...form}>
@@ -117,8 +141,6 @@ export default function UploadForm({ onGenerate }: Props) {
         <Button type="submit" className="cursor-pointer">
           Upload
         </Button>
-
-        {isLoading ? <div>loading ...</div> : ""}
       </form>
     </Form>
   );
