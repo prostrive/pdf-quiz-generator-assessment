@@ -124,7 +124,7 @@ export default function UploadForm({ onGenerate }: Props) {
           name="file"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Upload PDF</FormLabel>
+              <FormLabel>Choose PDF to generate quiz</FormLabel>
               <FormControl>
                 <Input
                   type="file"
@@ -139,7 +139,7 @@ export default function UploadForm({ onGenerate }: Props) {
         />
 
         <Button type="submit" className="cursor-pointer">
-          Upload
+          Generate
         </Button>
       </form>
     </Form>
