@@ -140,9 +140,7 @@ export default function UploadForm({ onGenerate }: Props) {
           )}
         />
 
-        <Button type="submit" className="cursor-pointer">
-          Generate
-        </Button>
+        <Button type="submit">Generate</Button>
       </form>
     </Form>
   );
