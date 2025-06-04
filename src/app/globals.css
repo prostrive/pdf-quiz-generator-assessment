@@ -122,6 +122,14 @@
 
 /* Custom utilities for PDF Quiz Generator */
 @layer utilities {
+  .drag-zone {
+    @apply border-2 border-dashed border-muted-foreground/30 rounded-lg transition-colors duration-200;
+  }
+
+  .drag-zone-active {
+    @apply border-primary bg-primary/5;
+  }
+
   .progress-bar {
     @apply h-2 bg-secondary rounded-full overflow-hidden;
   }
