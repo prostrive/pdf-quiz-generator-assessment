@@ -1,8 +1,6 @@
-interface MainLayoutProps {
-  children: React.ReactNode;
-}
+import { PropsWithChildren } from "react";
 
-export function MainLayout({ children }: MainLayoutProps) {
+export function MainLayout({ children }: PropsWithChildren) {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
