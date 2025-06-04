@@ -21,7 +21,8 @@ export default function QuizGenerator() {
     setIsProcessing(true)
 
     try {
-      const { text } = await extractPdfText(file)
+      const text  = await extractPdfText(file)
+      
       setInputText(text)
     } catch (error) {
       toast.error(`Error extracting text from PDF: ${String(error)}`)

@@ -134,12 +134,8 @@ const keySections = [
   "Workflow",
 ];
 
+const lowerKeySections = keySections.map((section) => section.toLowerCase());
 
-export interface ExtractedPdfText {
-  text: string;                   
-  pages: number;                   
-  sections: Record<string, string>; 
-}
 
 const MAX_PAGE = 10;
 
@@ -167,20 +163,10 @@ async function getPdfjs() {
   }
   return pdfjsPromise;
 }
-/**
- * Extracts text and key sections from a PDF file using pdfjs-dist.
- * - Only allows PDF files up to MAX_PAGE pages.
- * - Extracts only content for pages containing a key section header.
- * - Skips pages that do not contain a key section header.
- *
- * @param file The PDF File to extract text from
- * @returns ExtractedPdfText containing full text, page count, and sectioned text
- */
-export async function extractPdfText(file: File): Promise<ExtractedPdfText> {
-  // Use shared pdfjs instance with workerSrc set only once
+
+export async function extractPdfText(file: File): Promise<string> {
   const pdfjs = await getPdfjs();
 
-  // Only allow PDF files
   if (file.type !== "application/pdf") {
     throw new Error("Please upload a PDF file only.");
   }
@@ -188,43 +174,38 @@ export async function extractPdfText(file: File): Promise<ExtractedPdfText> {
   const arrayBuffer = await file.arrayBuffer();
   const pdf: PDFDocumentProxy = await pdfjs.getDocument({ data: arrayBuffer }).promise;
 
-  // Restrict to MAX_PAGE pages
   if (pdf.numPages > MAX_PAGE) {
     throw new Error(
       `PDF has more than ${MAX_PAGE} pages. Please upload a PDF with ${MAX_PAGE} pages or less.`
     );
   }
 
-  const lowerKeySections = keySections.map((k) => k.toLowerCase());
-  const sections: Record<string, string> = {};
-  let fullText = "";
+  // Assumes lowerKeySections is defined in the surrounding scope
+  const pagePromises = Array.from({ length: pdf.numPages }, (_, idx) => (
+    async () => {
+      const page = await pdf.getPage(idx + 1);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items
+        .map((item) => ("str" in item ? item.str : ""))
+        .join(" ")
+        .trim()
+        .toLowerCase();
 
-  // Only capture content for pages that match a key section
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
-    const textContent = await page.getTextContent();
-    const pageText = textContent.items
-      .map((item) => ("str" in item ? item.str : ""))
-      .join(" ");
-    const pageTextClean = pageText.trim();
-    fullText += pageTextClean + "\n";
+      const matchedIndex = lowerKeySections.findIndex((section) =>
+        pageText.includes(section)
+      );
 
-    const lowerPageText = pageTextClean.toLowerCase();
-
-    // If a key section header is found, store only that page's content under the section
-    const matchedIndex = lowerKeySections.findIndex((section) =>
-      lowerPageText.includes(section)
-    );
-    if (matchedIndex !== -1) {
-      const sectionTitle = keySections[matchedIndex];
-      // Only store the section if it contains the key section
-      sections[sectionTitle] = pageTextClean;
+      // Only return text if a key section is matched
+      return matchedIndex !== -1 ? pageText : "";
     }
+  )());
+
+  const pageTexts = await Promise.all(pagePromises);
+  const result = pageTexts.join("\n").trim();
+
+  if (!result) {
+    throw new Error("PDF has no content");
   }
 
-  return {
-    text: fullText.trim(),
-    pages: pdf.numPages,
-    sections,
-  };
+  return result;
 }
