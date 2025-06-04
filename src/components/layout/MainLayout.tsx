@@ -2,7 +2,7 @@ import { PropsWithChildren } from "react";
 
 export function MainLayout({ children }: PropsWithChildren) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
@@ -14,7 +14,7 @@ export function MainLayout({ children }: PropsWithChildren) {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto flex-grow px-4 py-8">
         <div className="max-w-4xl mx-auto">{children}</div>
       </main>
 

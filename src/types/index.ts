@@ -59,3 +59,13 @@ export interface LoadingState {
   message?: string;
   progress?: number;
 }
+
+export interface ValidationError {
+  type: "file-type" | "file-size" | "file-missing";
+  message: string;
+}
+
+export interface ValidationResult {
+  isValid: boolean;
+  error?: ValidationError;
+}

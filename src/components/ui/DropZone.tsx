@@ -1,4 +1,4 @@
-import { DragEvent, useState } from "react";
+import { DragEvent, useState, useRef } from "react";
 import { Upload, FileX } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -10,12 +10,18 @@ interface Props {
 
 export function DropZone({ onFileSelect, className, disabled = false }: Props) {
   const [isDragOver, setIsDragOver] = useState(false);
+  const dragCounterRef = useRef(0);
 
   const handleDragEnter = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
 
-    if (!disabled) {
+    if (disabled) return;
+
+    dragCounterRef.current++;
+
+    // Only set isDragOver to true if we have valid files
+    if (e.dataTransfer.types.includes("Files")) {
       setIsDragOver(true);
     }
   };
@@ -23,18 +29,36 @@ export function DropZone({ onFileSelect, className, disabled = false }: Props) {
   const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsDragOver(false);
+
+    if (disabled) return;
+
+    dragCounterRef.current--;
+
+    // Only set isDragOver to false when we've left the main container
+    if (dragCounterRef.current === 0) {
+      setIsDragOver(false);
+    }
   };
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (disabled) return;
+
+    // Set dropEffect to indicate this is a valid drop zone
+    if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = "copy";
+    }
   };
 
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // Reset drag state
     setIsDragOver(false);
+    dragCounterRef.current = 0;
 
     if (disabled) return;
 
@@ -63,7 +87,7 @@ export function DropZone({ onFileSelect, className, disabled = false }: Props) {
       tabIndex={disabled ? -1 : 0}
       aria-label="Drop PDF file here"
     >
-      <div className="flex flex-col items-center gap-4">
+      <div className="flex flex-col items-center gap-4 pointer-events-none">
         {isDragOver ? (
           <div className="animate-bounce">
             <Upload className="w-12 h-12 text-primary" />
@@ -79,9 +103,8 @@ export function DropZone({ onFileSelect, className, disabled = false }: Props) {
           <p className="text-sm text-muted-foreground">Only PDF files are accepted</p>
         </div>
       </div>
-
       {isDragOver && (
-        <div className="absolute inset-0 bg-primary/5 rounded-lg border-2 border-primary border-dashed animate-pulse" />
+        <div className="absolute inset-0 bg-primary/5 rounded-lg border-2 border-primary border-dashed animate-pulse pointer-events-none" />
       )}
     </div>
   );
