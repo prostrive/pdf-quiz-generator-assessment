@@ -43,6 +43,7 @@ export default function QuizGenerator() {
     },
     onError: function (err) {
       toast.error(`Error: ${err}`)
+      handleReset()
     },
   })
 
@@ -61,13 +62,6 @@ export default function QuizGenerator() {
 
   return (
     <div className="space-y-4 w-xl max-w-xl mx-auto mt-8 p-4 border rounded shadow">
-      <textarea
-        value={inputText}
-        onChange={function (e) { setInputText(e.target.value) }}
-        placeholder="Enter text to generate quiz..."
-        className="w-full border p-2 rounded resize-none"
-        rows={6}
-      />
       <div className="flex space-x-2">
         <Button onClick={handleGenerate} disabled={isLoading || isProcessing || inputText.length === 0}>
           {isLoading ? "Generating..." : isProcessing ? "Processing PDF..." : "Generate Quiz"}
