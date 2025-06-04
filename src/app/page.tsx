@@ -4,34 +4,11 @@ import { useState } from "react";
 import { UploadInterface } from "@/components/UploadInterface";
 
 export default function Home() {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [processingProgress, setProcessingProgress] = useState(0);
+  const [processedFile, setProcessedFile] = useState<File | null>(null);
 
-  const handleFileValidated = (file: File) => {
-    setSelectedFile(file);
-    console.log("Valid PDF file selected:", file.name);
-
-    simulateProcessing();
-  };
-
-  const simulateProcessing = () => {
-    setIsProcessing(true);
-    setProcessingProgress(0);
-
-    // Simulate processing progress
-    const interval = setInterval(() => {
-      setProcessingProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setIsProcessing(false);
-
-          return 100;
-        }
-
-        return prev + 10;
-      });
-    }, 500);
+  const handleFileProcessed = (file: File) => {
+    setProcessedFile(file);
+    console.log("PDF file processed and ready:", file.name);
   };
 
   return (
@@ -44,16 +21,12 @@ export default function Home() {
         </p>
       </div>
 
-      <UploadInterface
-        onFileValidated={handleFileValidated}
-        isProcessing={isProcessing}
-        processingProgress={processingProgress}
-      />
+      <UploadInterface onFileProcessed={handleFileProcessed} />
 
-      {selectedFile && !isProcessing && (
+      {processedFile && (
         <div className="mt-8 text-center">
           <p className="text-muted-foreground">
-            Ready to process: <span className="font-medium">{selectedFile.name}</span>
+            File processed: <span className="font-medium">{processedFile.name}</span>
           </p>
         </div>
       )}

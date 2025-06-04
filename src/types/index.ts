@@ -16,34 +16,10 @@ export interface Quiz {
   score?: number;
 }
 
-// File upload types
-export type UploadState = "idle" | "uploading" | "processing" | "success" | "error";
-
-export interface FileUploadStatus {
-  state: UploadState;
-  progress: number;
-  error?: string;
-  fileName?: string;
-  fileSize?: number;
-}
-
-// PDF processing types
-export interface PDFContent {
-  text: string;
-  pageCount: number;
-  fileName: string;
-}
-
 // API response types
 export interface QuizGenerationResponse {
   success: boolean;
   quiz?: Quiz;
-  error?: string;
-}
-
-export interface UploadResponse {
-  success: boolean;
-  content?: PDFContent;
   error?: string;
 }
 
@@ -54,12 +30,6 @@ export interface ErrorState {
   dismissible?: boolean;
 }
 
-export interface LoadingState {
-  isLoading: boolean;
-  message?: string;
-  progress?: number;
-}
-
 export interface ValidationError {
   type: "file-type" | "file-size" | "file-missing";
   message: string;
@@ -68,4 +38,20 @@ export interface ValidationError {
 export interface ValidationResult {
   isValid: boolean;
   error?: ValidationError;
+}
+
+export interface UploadProgress {
+  phase: "idle" | "uploading" | "processing" | "complete" | "error";
+  progress: number; // 0-100
+  message: string;
+  timeRemaining?: number; // in seconds
+  uploadSpeed?: number; // bytes per second
+}
+
+export interface UploadState {
+  file: File | null;
+  progress: UploadProgress;
+  error: string | null;
+  startTime: number | null;
+  bytesUploaded: number;
 }
