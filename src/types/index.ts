@@ -1,3 +1,5 @@
+import { getPDFWorkerConfig } from "@/lib/pdfWorker";
+
 // Core quiz types
 export interface Question {
   id: string;
@@ -54,4 +56,11 @@ export interface UploadState {
   error: string | null;
   startTime: number | null;
   bytesUploaded: number;
+}
+
+export interface PDFWorkerState {
+  isInitialized: boolean;
+  isInitializing: boolean;
+  error: string | null;
+  config: Awaited<ReturnType<typeof getPDFWorkerConfig>> | null;
 }

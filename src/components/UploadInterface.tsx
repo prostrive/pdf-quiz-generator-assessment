@@ -1,12 +1,16 @@
+"use client";
+
 import { useState } from "react";
 import { DropZone } from "@/components/ui/DropZone";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { FileInput } from "@/components/ui/FileInput";
 import { UploadProgressDisplay } from "@/components/ui/UploadProgressDisplay";
+import { usePDFWorker } from "@/hooks/usePDFWorker";
 import { useUploadProgress } from "@/hooks/useUploadProgress";
 import { formatFileSize, validatePDFFile } from "@/lib/fileValidation";
 import { cn } from "@/lib/utils";
 import { ValidationError } from "@/types";
+import { PDFWorkerStatus } from "./PDFWorkerStatus";
 
 interface Props {
   onFileProcessed: (file: File) => void;
@@ -16,9 +20,32 @@ export function UploadInterface({ onFileProcessed }: Props) {
   const [validationError, setValidationError] = useState<ValidationError | null>(null);
   const [uploadMethod, setUploadMethod] = useState<"browse" | "drag">("browse");
   const { uploadState, simulateUpload, simulateProcessing, reset } = useUploadProgress();
+  const { isReady: pdfWorkerReady } = usePDFWorker();
   const isUploading = uploadState.progress.phase === "uploading" || uploadState.progress.phase === "processing";
 
+  const getUploadMethodClass = (isSelected: boolean) =>
+    cn(
+      "px-4 py-2 rounded-md text-sm font-medium transition-colors",
+      isSelected ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
+      isUploading && "opacity-50 cursor-not-allowed"
+    );
+
+  // Handle when PDF worker is ready
+  const handleWorkerReady = () => {
+    console.log("PDF Worker is ready for processing");
+  };
+
   const handleFileSelect = (file: File) => {
+    // Check if PDF worker is ready
+    if (!pdfWorkerReady) {
+      setValidationError({
+        type: "file-missing",
+        message: "PDF processor is not ready. Please wait for initialization to complete."
+      });
+
+      return;
+    }
+
     setValidationError(null);
     reset(); // Clear any previous upload state
 
@@ -51,32 +78,23 @@ export function UploadInterface({ onFileProcessed }: Props) {
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6">
+      {/* PDF Worker Status */}
+      <PDFWorkerStatus onWorkerReady={handleWorkerReady} />
+
       {/* Upload Method Toggle */}
       <div className="flex justify-center">
         <div className="bg-muted rounded-lg p-1 flex">
           <button
             onClick={() => setUploadMethod("browse")}
             disabled={isUploading}
-            className={cn(
-              "px-4 py-2 rounded-md text-sm font-medium transition-colors",
-              uploadMethod === "browse"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground",
-              isUploading && "opacity-50 cursor-not-allowed"
-            )}
+            className={getUploadMethodClass(uploadMethod === "browse")}
           >
             Browse Files
           </button>
           <button
             onClick={() => setUploadMethod("drag")}
             disabled={isUploading}
-            className={cn(
-              "px-4 py-2 rounded-md text-sm font-medium transition-colors",
-              uploadMethod === "drag"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground",
-              isUploading && "opacity-50 cursor-not-allowed"
-            )}
+            className={getUploadMethodClass(uploadMethod === "drag")}
           >
             Drag & Drop
           </button>
