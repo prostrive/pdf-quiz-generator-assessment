@@ -59,14 +59,14 @@ export default function QuizGenerator() {
       fileInputRef.current.value = ''
     }
   }
-
+  const disabledInputs =  isLoading || isProcessing || inputText.length === 0
   return (
     <div className="space-y-4 w-xl max-w-xl mx-auto mt-8 p-4 border rounded shadow">
       <div className="flex space-x-2">
-        <Button onClick={handleGenerate} disabled={isLoading || isProcessing || inputText.length === 0}>
+        <Button onClick={handleGenerate} disabled={disabledInputs}>
           {isLoading ? "Generating..." : isProcessing ? "Processing PDF..." : "Generate Quiz"}
         </Button>
-        <Button variant="outline" onClick={handleReset}>
+        <Button variant="outline" onClick={handleReset}  disabled={disabledInputs}>
           Reset
         </Button>
       </div>
