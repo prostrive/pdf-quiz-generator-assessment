@@ -6,16 +6,16 @@ import { serverRequestErrExtractor } from '@/helpers'
 import { QuizRequest, QuizResponse } from '@/schema'
 import { withCatchAsync } from '@/lib/utils'
 
-export const generateQuizFromText = async (data: QuizRequest) => {
+export async function generateQuizFromText (data: QuizRequest) {
   const response = await axios.post<QuizResponse>('/api/generate-quiz', { text: data.text })
   return response.data
 }
 
-export const useGenerateQuiz = ({
+export function useGenerateQuiz({
   showMessage = true,
   onSuccess,
   onError,
-}: IAPIHook<QuizResponse, string> & IQueryProps = {}) => {
+}: IAPIHook<QuizResponse, string> & IQueryProps = {}){
   const queryClient = useQueryClient()
 
   return useMutation<QuizResponse, string, QuizRequest>({
