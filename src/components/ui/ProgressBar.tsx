@@ -13,9 +13,7 @@ export function ProgressBar({ progress, className, size = "medium", showPercenta
     medium: "h-2",
     large: "h-3"
   };
-
-  // Ensure progress is between 0 and 100
-  const clampedProgress = Math.min(100, Math.max(0, progress));
+  const clampedProgress = Math.min(100, Math.max(0, progress)); // Ensure progress is between 0 and 100
 
   return (
     <div className={cn("w-full", className)}>

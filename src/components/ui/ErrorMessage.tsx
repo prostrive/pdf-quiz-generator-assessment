@@ -1,5 +1,5 @@
 import { AlertCircle, AlertTriangle, Info, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { ErrorState } from "@/types";
 
@@ -14,14 +14,12 @@ export function ErrorMessage({ type, message, dismissible = true, onDismiss, cla
     warning: AlertTriangle,
     info: Info
   };
-
   const styles = {
     error: "bg-red-50 border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-200",
     warning:
       "bg-yellow-50 border-yellow-200 text-yellow-800 dark:bg-yellow-950 dark:border-yellow-800 dark:text-yellow-200",
     info: "bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-200"
   };
-
   const Icon = icons[type];
 
   return (

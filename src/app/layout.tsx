@@ -1,23 +1,19 @@
+import { PropsWithChildren } from "react";
 import type { Metadata } from "next";
-import "./globals.css";
+import { MainLayout } from "@/components/layout/MainLayout";
 
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "PDF Quiz Generator",
-  description: "Generate quizzes from PDFs",
+  description: "Generate quizzes from PDFs"
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
   return (
     <html lang="en">
-      <body
-        className={`antialiased`}
-      >
-        {children}
+      <body className="antialiased">
+        <MainLayout>{children}</MainLayout>
       </body>
     </html>
   );
