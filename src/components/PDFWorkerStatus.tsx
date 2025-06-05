@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { usePDFWorker } from "@/hooks/usePDFWorker";
+import { Button } from "./ui/Button";
 import { ErrorMessage } from "./ui/ErrorMessage";
 import { LoadingSpinner } from "./ui/LoadingSpinner";
 
@@ -31,17 +32,13 @@ export function PDFWorkerStatus({ onWorkerReady }: Props) {
       </div>
     );
   }
-
   if (error) {
     return (
       <div className="space-y-3">
         <ErrorMessage type="error" message={error} dismissible={false} />
-        <button
-          onClick={reset}
-          className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-        >
+        <Button onClick={reset} variant="destructive" size="sm">
           Retry Initialization
-        </button>
+        </Button>
       </div>
     );
   }

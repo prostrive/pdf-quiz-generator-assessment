@@ -64,3 +64,90 @@ export interface PDFWorkerState {
   error: string | null;
   config: Awaited<ReturnType<typeof getPDFWorkerConfig>> | null;
 }
+
+// PDF text extraction types
+export interface PDFInfo {
+  numPages: number;
+  fileName: string;
+  fileSize: number;
+  title?: string;
+  author?: string;
+}
+
+export interface ExtractedText {
+  content: string;
+  pageNumber: number;
+  wordCount: number;
+  charCount: number;
+}
+
+export interface MultiPageExtractedText {
+  fullText: string;
+  pageTexts: string[];
+  pageCount: number;
+  totalWordCount: number;
+  totalCharCount: number;
+}
+
+export interface TextExtractionResult {
+  success: boolean;
+  text?: ExtractedText;
+  multiPageText?: MultiPageExtractedText;
+  error?: string;
+}
+
+export interface TextValidation {
+  isValid: boolean;
+  wordCount: number;
+  charCount: number;
+  issues: string[];
+}
+
+export interface TextExtractionState {
+  isExtracting: boolean;
+  error: string | null;
+  pdfInfo: PDFInfo | null;
+  extractedText: ExtractedText | null;
+  multiPageText: MultiPageExtractedText | null;
+  validation: TextValidation | null;
+  extractionProgress?: {
+    currentPage: number;
+    totalPages: number;
+  };
+}
+
+// Content preprocessing types
+export interface PreprocessingOptions {
+  maxTokens?: number;
+  removeHeaders?: boolean;
+  removeExcessiveWhitespace?: boolean;
+  minParagraphLength?: number;
+}
+
+export interface PreprocessedContent {
+  cleanedText: string;
+  originalLength: number;
+  cleanedLength: number;
+  removedSections: number;
+  estimatedTokens: number;
+}
+
+export interface ContentValidation {
+  isValid: boolean;
+  issues: string[];
+}
+
+export interface PreprocessingOptions {
+  maxTokens?: number; // Maximum tokens for OpenAI API (default: 3000)
+  removeHeaders?: boolean; // Remove likely headers/footers (default: true)
+  removeExcessiveWhitespace?: boolean; // Clean up whitespace (default: true)
+  minParagraphLength?: number; // Minimum paragraph length to keep (default: 20)
+}
+
+export interface PreprocessedContent {
+  cleanedText: string;
+  originalLength: number;
+  cleanedLength: number;
+  removedSections: number;
+  estimatedTokens: number;
+}
