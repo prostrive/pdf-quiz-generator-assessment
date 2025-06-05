@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { DropZone } from "@/components/ui/DropZone";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { FileInput } from "@/components/ui/FileInput";
@@ -12,8 +12,10 @@ import { useTextExtraction } from "@/hooks/useTextExtraction";
 import { useUploadProgress } from "@/hooks/useUploadProgress";
 import { formatFileSize, validatePDFFile } from "@/lib/fileValidation";
 import { cn } from "@/lib/utils";
-import { MultiPageExtractedText, PreprocessedContent as TPreprocessedContent, ValidationError } from "@/types";
+import { MultiPageExtractedText, Quiz, PreprocessedContent as TPreprocessedContent, ValidationError } from "@/types";
+import { OpenAIClientStatus } from "./OpenAIClientStatus";
 import { PDFWorkerStatus } from "./PDFWorkerStatus";
+import { QuizGenerationInterface } from "./QuizGenerationInterface";
 
 interface PreprocessedContentProps {
   preprocessedContent: TPreprocessedContent;
@@ -97,6 +99,7 @@ function ValidationIssueList({ issues, title }: ValidationIssueListProps) {
 export function UploadInterface({ onFileProcessed }: UploadInterfaceProps) {
   const [validationError, setValidationError] = useState<ValidationError | null>(null);
   const [uploadMethod, setUploadMethod] = useState<"browse" | "drag">("browse");
+  const [generatedQuiz, setGeneratedQuiz] = useState<Quiz | null>(null);
   const { uploadState, simulateUpload, simulateProcessing, reset } = useUploadProgress();
   const { isReady: pdfWorkerReady } = usePDFWorker();
   const {
@@ -115,6 +118,8 @@ export function UploadInterface({ onFileProcessed }: UploadInterfaceProps) {
   } = useContentPreprocessing();
   const isUploading = uploadState.progress.phase === "uploading" || uploadState.progress.phase === "processing";
   const isProcessing = isUploading || isExtracting || isPreprocessing;
+  const isContentReady =
+    uploadState.progress.phase === "complete" && !!preprocessedContent && !!preprocessingValidation?.isValid;
 
   const getUploadMethodClass = (isSelected: boolean) =>
     cn(
@@ -208,10 +213,18 @@ export function UploadInterface({ onFileProcessed }: UploadInterfaceProps) {
     setValidationError(null);
   };
 
+  const handleQuizGenerated = (quiz: Quiz) => {
+    setGeneratedQuiz(quiz);
+    console.log("Quiz generated:", quiz);
+  };
+
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6">
       {/* PDF Worker Status */}
       <PDFWorkerStatus onWorkerReady={handleWorkerReady} />
+
+      {/* OpenAI Client Status */}
+      <OpenAIClientStatus />
 
       <div className="flex justify-center">
         <div className="bg-muted rounded-lg p-1 flex">
@@ -316,6 +329,38 @@ export function UploadInterface({ onFileProcessed }: UploadInterfaceProps) {
               {preprocessingValidation && preprocessingValidation.issues.length > 0 && (
                 <ValidationIssueList issues={preprocessingValidation.issues} title="Content Preprocessing Issues" />
               )}
+            </div>
+          )}
+
+          {/* Quiz Generation Interface */}
+          {isContentReady && (
+            <div className="mt-6">
+              <QuizGenerationInterface
+                content={preprocessedContent}
+                isContentReady={isContentReady}
+                onQuizGenerated={handleQuizGenerated}
+              />
+            </div>
+          )}
+
+          {/* Generated Quiz Display */}
+          {generatedQuiz && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <div>
+                  <p className="text-sm font-medium text-blue-800">Quiz Ready!</p>
+                  <p className="text-xs text-blue-600">
+                    &quot;{generatedQuiz.title}&quot; with {generatedQuiz.questions.length} questions
+                  </p>
+                </div>
+              </div>
+              <div className="text-xs text-blue-600">
+                <p>
+                  Your quiz has been generated and is ready to use. You can now take the quiz or generate a new one with
+                  different options.
+                </p>
+              </div>
             </div>
           )}
         </div>

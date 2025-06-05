@@ -18,11 +18,75 @@ export interface Quiz {
   score?: number;
 }
 
-// API response types
+export interface QuizGenerationState {
+  isGenerating: boolean;
+  currentQuiz: Quiz | null;
+  error: string | null;
+  progress: {
+    phase: "idle" | "validating" | "generating" | "parsing" | "complete" | "error";
+    message: string;
+  };
+}
+
 export interface QuizGenerationResponse {
   success: boolean;
   quiz?: Quiz;
   error?: string;
+}
+
+// Add interfaces for parsed response
+export interface ParsedQuestionResponse {
+  id?: string;
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  explanation?: string;
+}
+
+export interface ParsedQuizResponse {
+  questions: ParsedQuestionResponse[];
+}
+
+export interface QuizPromptOptions {
+  questionCount?: number;
+  difficulty?: "easy" | "medium" | "hard";
+  includeExplanations?: boolean;
+  focusAreas?: string[];
+}
+
+export interface QuizGenerationOptions extends QuizPromptOptions {
+  title?: string;
+  model?: string;
+  maxRetries?: number;
+}
+
+// OpenAI API types
+export interface OpenAIClientState {
+  isConnected: boolean | null; // null = not tested yet
+  isTesting: boolean;
+  error: string | null;
+}
+
+export interface OpenAIQuizRequest {
+  content: string;
+  questionCount?: number;
+  difficulty?: "easy" | "medium" | "hard";
+  instructions?: string;
+}
+
+export interface OpenAIQuizResponse {
+  questions: Question[];
+  metadata?: {
+    generatedAt: string;
+    model: string;
+    tokensUsed: number;
+  };
+}
+
+export interface OpenAIAPIError {
+  message: string;
+  type: string;
+  statusCode?: number;
 }
 
 // UI component types

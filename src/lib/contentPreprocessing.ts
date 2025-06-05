@@ -93,6 +93,7 @@ function removeHeadersAndFooters(text: string, minParagraphLength: number): { te
 
     // Remove paragraphs that are mostly special characters
     const specialCharRatio = (cleaned.match(/[^\w\s]/g) || []).length / cleaned.length;
+
     if (specialCharRatio > 0.5) {
       removedCount++;
 

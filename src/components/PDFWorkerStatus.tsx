@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { usePDFWorker } from "@/hooks/usePDFWorker";
-import { Button } from "./ui/Button";
-import { ErrorMessage } from "./ui/ErrorMessage";
-import { LoadingSpinner } from "./ui/LoadingSpinner";
 
 interface Props {
   onWorkerReady?: () => void;
@@ -32,6 +32,7 @@ export function PDFWorkerStatus({ onWorkerReady }: Props) {
       </div>
     );
   }
+
   if (error) {
     return (
       <div className="space-y-3">
