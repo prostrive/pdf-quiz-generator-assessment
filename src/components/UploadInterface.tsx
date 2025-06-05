@@ -47,18 +47,18 @@ function PreprocessedContent({ preprocessedContent, isContentReady }: Preprocess
   return (
     <div className={cn("pt-2 border-t", borderColor)}>
       <h4 className={cn("text-xs font-semibold mb-2", textColor)}>Content Preprocessing</h4>
-      <div className="grid grid-cols-3 gap-4 text-xs mb-3">
-        <div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 text-xs mb-3">
+        <div className="space-y-1">
           <span className={cn("font-medium", textColor)}>Content optimized:</span>
-          <span className={cn("ml-1", valueColor)}>{reducedPercentage}% reduced</span>
+          <span className={cn("ml-1 block sm:inline", valueColor)}>{reducedPercentage}% reduced</span>
         </div>
-        <div>
+        <div className="space-y-1">
           <span className={cn("font-medium", textColor)}>Estimated tokens:</span>
-          <span className={cn("ml-1", valueColor)}>{preprocessedContent.estimatedTokens}</span>
+          <span className={cn("ml-1 block sm:inline", valueColor)}>{preprocessedContent.estimatedTokens}</span>
         </div>
-        <div>
+        <div className="space-y-1">
           <span className={cn("font-medium", textColor)}>Sections removed:</span>
-          <span className={cn("ml-1", valueColor)}>{preprocessedContent.removedSections}</span>
+          <span className={cn("ml-1 block sm:inline", valueColor)}>{preprocessedContent.removedSections}</span>
         </div>
       </div>
     </div>
@@ -72,18 +72,18 @@ function TextExtractionResult({ multiPageText, isContentReady }: TextExtractionR
   return (
     <>
       <h4 className={cn("text-xs font-semibold mb-2", textColor)}>Text Extraction Results</h4>
-      <div className="grid grid-cols-3 gap-4 text-xs mb-3">
-        <div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 text-xs mb-3">
+        <div className="space-y-1">
           <span className={cn("font-medium", textColor)}>Pages processed:</span>
-          <span className={cn("ml-1", valueColor)}>{multiPageText.pageCount}</span>
+          <span className={cn("ml-1 block sm:inline", valueColor)}>{multiPageText.pageCount}</span>
         </div>
-        <div>
+        <div className="space-y-1">
           <span className={cn("font-medium", textColor)}>Words extracted:</span>
-          <span className={cn("ml-1", valueColor)}>{multiPageText.totalWordCount}</span>
+          <span className={cn("ml-1 block sm:inline", valueColor)}>{multiPageText.totalWordCount}</span>
         </div>
-        <div>
+        <div className="space-y-1">
           <span className={cn("font-medium", textColor)}>Characters:</span>
-          <span className={cn("ml-1", valueColor)}>{multiPageText.totalCharCount}</span>
+          <span className={cn("ml-1 block sm:inline", valueColor)}>{multiPageText.totalCharCount}</span>
         </div>
       </div>
     </>
@@ -92,11 +92,14 @@ function TextExtractionResult({ multiPageText, isContentReady }: TextExtractionR
 
 function ValidationIssueList({ issues, title }: ValidationIssueListProps) {
   return (
-    <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
-      <p className="text-yellow-700 font-medium">{title}:</p>
+    <div className="mt-2 p-2 sm:p-3 bg-yellow-50 border border-yellow-200 rounded text-xs sm:text-sm">
+      <p className="text-yellow-700 font-medium mb-1">{title}:</p>
       <ul className="mt-1 text-yellow-600 space-y-1">
         {issues.map((issue, index) => (
-          <li key={index}>• {issue}</li>
+          <li key={index} className="flex items-start gap-2 leading-relaxed">
+            <span className="text-yellow-500 mt-0.5 flex-shrink-0">•</span>
+            <span className="break-words">{issue}</span>
+          </li>
         ))}
       </ul>
     </div>
@@ -129,7 +132,7 @@ export function UploadInterface({ onFileProcessed }: UploadInterfaceProps) {
 
   const getUploadMethodClass = (isSelected: boolean) =>
     cn(
-      "px-4 py-2 rounded-md text-sm font-medium transition-colors",
+      "px-3 py-2 sm:px-4 sm:py-2 rounded-md text-xs sm:text-sm font-medium transition-colors",
       isSelected
         ? "bg-background text-foreground shadow-sm hover:bg-background"
         : "text-muted-foreground hover:text-foreground",
@@ -226,7 +229,7 @@ export function UploadInterface({ onFileProcessed }: UploadInterfaceProps) {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-6">
+    <div className="w-full max-w-2xl mx-auto space-y-4 sm:space-y-6 px-0">
       {/* PDF Worker Status */}
       <PDFWorkerStatus onWorkerReady={handleWorkerReady} />
 
@@ -234,7 +237,7 @@ export function UploadInterface({ onFileProcessed }: UploadInterfaceProps) {
       <OpenAIClientStatus />
 
       <div className="flex justify-center">
-        <div className="bg-muted rounded-lg p-1 flex">
+        <div className="bg-muted rounded-lg p-1 flex sm:max-w-none sm:w-auto">
           <Button
             onClick={() => setUploadMethod("browse")}
             disabled={isProcessing}
@@ -265,13 +268,25 @@ export function UploadInterface({ onFileProcessed }: UploadInterfaceProps) {
 
       {/* Validation Rules */}
       {uploadState.progress.phase === "idle" && (
-        <div className="bg-muted/50 rounded-lg p-4">
-          <h3 className="text-sm font-medium mb-2">File Requirements:</h3>
-          <ul className="text-xs text-muted-foreground space-y-1">
-            <li>• File format: PDF only</li>
-            <li>• Maximum size: {formatFileSize(FILE_VALIDATION_CONFIG.maxFileSize)}</li>
-            <li>• Text-based PDFs work best for quiz generation</li>
-            <li>• Recommended size: Under {formatFileSize(3 * 1024 * 1024)} for faster processing</li>
+        <div className="bg-muted/50 rounded-lg p-3 sm:p-4">
+          <h3 className="text-sm font-medium mb-2 sm:mb-3">File Requirements:</h3>
+          <ul className="text-xs sm:text-sm text-muted-foreground space-y-1.5 sm:space-y-1">
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span>File format: PDF only</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span>Maximum size: {formatFileSize(FILE_VALIDATION_CONFIG.maxFileSize)}</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span>Text-based PDFs work best for quiz generation</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span>Recommended size: Under {formatFileSize(3 * 1024 * 1024)} for faster processing</span>
+            </li>
           </ul>
         </div>
       )}
@@ -346,9 +361,9 @@ export function UploadInterface({ onFileProcessed }: UploadInterfaceProps) {
 
               {/* Content Not Ready Message */}
               {!isContentReady && (
-                <div className="mt-4 p-3 bg-yellow-100 border border-yellow-300 rounded-md">
+                <div className="mt-3 sm:mt-4 p-3 bg-yellow-100 border border-yellow-300 rounded-md">
                   <p className="text-sm font-medium text-yellow-800 mb-1">Cannot generate quiz</p>
-                  <p className="text-xs text-yellow-700">
+                  <p className="text-xs sm:text-sm text-yellow-700 leading-relaxed">
                     The PDF content is not suitable for quiz generation. Please try uploading a PDF with more text
                     content.
                   </p>
@@ -359,7 +374,7 @@ export function UploadInterface({ onFileProcessed }: UploadInterfaceProps) {
 
           {/* Quiz Generation Interface */}
           {isContentReady && (
-            <div className="mt-6">
+            <div className="mt-4 sm:mt-6">
               <QuizGenerationInterface
                 content={preprocessedContent}
                 isContentReady={isContentReady}

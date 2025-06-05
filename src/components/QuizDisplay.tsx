@@ -110,8 +110,7 @@ export function QuizDisplay({
                 You got {correctCount} out of {quiz.questions.length} questions correct
               </p>
             </div>
-
-            <div className="flex gap-3">
+            <div className="flex gap-2 sm:gap-3">
               <Button
                 onClick={() => {
                   setShowResults(false);
@@ -122,9 +121,10 @@ export function QuizDisplay({
               >
                 Review Answers
               </Button>
-              <Button onClick={handleRestart} className="flex-1 flex items-center gap-2">
+              <Button onClick={handleRestart} className="flex-1 flex items-center justify-center gap-2">
                 <RotateCcw className="h-4 w-4" />
-                Retake Quiz
+                <span className="hidden sm:inline">Retake Quiz</span>
+                <span className="sm:hidden">Retake</span>
               </Button>
             </div>
           </CardContent>
@@ -162,8 +162,8 @@ export function QuizDisplay({
       />
 
       {/* Navigation Controls */}
-      <CardContent className="pt-12">
-        <div className="flex items-center justify-between">
+      <CardContent className="pt-6 sm:pt-12">
+        <div className="flex items-center justify-between gap-2">
           <Button
             onClick={handlePreviousQuestion}
             disabled={isFirstQuestion}
@@ -171,14 +171,14 @@ export function QuizDisplay({
             className="flex items-center gap-2"
           >
             <ChevronLeft className="h-4 w-4" />
-            Previous
+            <span className="hidden sm:inline">Previous</span>
           </Button>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {allQuestionsAnswered && !isCompleted && (
-              <Button onClick={handleQuizSubmit} className="flex items-center gap-2">
+              <Button onClick={handleQuizSubmit} className="flex items-center gap-2 px-3 sm:px-4">
                 <CheckCircle className="h-4 w-4" />
-                Submit Quiz
+                <span className="inline">Submit Quiz</span>
               </Button>
             )}
           </div>
@@ -189,7 +189,7 @@ export function QuizDisplay({
             variant="outline"
             className="flex items-center gap-2"
           >
-            Next
+            <span className="hidden sm:inline">Next</span>
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>

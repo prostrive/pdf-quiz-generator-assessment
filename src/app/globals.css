@@ -131,7 +131,7 @@
   }
 
   .quiz-card {
-    @apply bg-card border border-border rounded-lg p-6 shadow-sm;
+    @apply bg-card border border-border rounded-lg shadow-sm;
   }
 
   .question-option {
@@ -148,5 +148,56 @@
 
   .progress-fill {
     @apply h-full bg-primary transition-all duration-300 ease-out;
+  }
+}
+
+/* Mobile-specific improvements for touch interactions */
+@media (max-width: 639px) {
+  button,
+  input,
+  select,
+  textarea,
+  [role="button"] {
+    touch-action: manipulation;
+  }
+
+  /* Better touch feedback */
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+
+  /* Better text readability on mobile */
+  body {
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Better spacing for mobile grids */
+  .mobile-grid-responsive {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  /* Improve drag and drop on mobile */
+  [data-drag-zone] {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  /* Allow text selection for content areas */
+  p,
+  span,
+  div:not([role="button"]):not(.question-option) {
+    -webkit-user-select: text;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx) {
+  /* Ensure crisp rendering on high DPI screens */
+  .upload-interface {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }

@@ -28,7 +28,7 @@ export function QuestionDisplay({
 
   const getOptionClassName = (optionIndex: number) => {
     const baseClasses =
-      "question-option bg-white text-foreground hover:bg-accent hover:text-accent-foreground cursor-pointer [&>div]:items-center [&>div>div]:m-0";
+      "question-option bg-white text-foreground hover:bg-accent hover:text-accent-foreground cursor-pointer whitespace-normal h-auto [&>div]:items-center [&>div>div]:m-0";
 
     if (showCorrectAnswer) {
       // Show correct/incorrect answers
@@ -88,13 +88,13 @@ export function QuestionDisplay({
                 aria-describedby={`option-${index}-description`}
               >
                 <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 mt-0.5">
-                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full border border-current text-sm font-medium">
+                  <div className="flex-shrink-0 flex items-center text-center">
+                    <span className="w-6 h-6 rounded-full border border-current text-sm font-medium">
                       {optionLabels[index]}
                     </span>
                   </div>
-                  <div className="flex-1 text-left">
-                    <span className="text-sm leading-relaxed">{option}</span>
+                  <div className="flex items-center">
+                    <span className="text-sm">{option}</span>
                   </div>
                 </div>
               </Button>
@@ -105,7 +105,7 @@ export function QuestionDisplay({
         {/* Correct Answer Indicator (when in review mode) */}
         {showCorrectAnswer && (
           <div className="pt-4 border-t border-border space-y-3">
-            <div className="flex items-center gap-2 text-sm">
+            <div className="flex flex-col gap-2 text-sm">
               <span className="text-muted-foreground">Correct answer:</span>
               <span className="font-medium text-green-700">
                 {optionLabels[question.correctAnswer]} - {question.options[question.correctAnswer]}
@@ -115,7 +115,7 @@ export function QuestionDisplay({
             {/* Explanation (if available) */}
             {question.explanation && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <div className="flex items-start gap-2">
+                <div className="flex flex-col items-start gap-2">
                   <span className="text-blue-600 font-medium text-sm">Explanation:</span>
                   <p className="text-blue-800 text-sm leading-relaxed">{question.explanation}</p>
                 </div>

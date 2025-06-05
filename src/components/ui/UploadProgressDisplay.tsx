@@ -92,14 +92,14 @@ export function UploadProgressDisplay({ progress, fileName, fileSize, uploadSpee
   if (progress.phase === "idle") return null;
 
   return (
-    <div className={cn("bg-muted/50 rounded-lg p-4 space-y-4", className)}>
+    <div className={cn("bg-muted/50 rounded-lg p-3 sm:p-4 space-y-3 sm:space-y-4", className)}>
       {/* Header with file info */}
       {fileName && (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <div className="flex-shrink-0">{getPhaseIcon()}</div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">{fileName}</p>
-            {fileSize && <p className="text-xs text-muted-foreground">{formatFileSize(fileSize)}</p>}
+            <p className="text-sm font-medium truncate leading-tight">{fileName}</p>
+            {fileSize && <p className="text-xs text-muted-foreground mt-0.5">{formatFileSize(fileSize)}</p>}
           </div>
         </div>
       )}
@@ -109,21 +109,21 @@ export function UploadProgressDisplay({ progress, fileName, fileSize, uploadSpee
 
       {/* Status message and details */}
       <div className="space-y-2">
-        <p className={cn("text-sm font-medium", getPhaseColor())}>{progress.message}</p>
+        <p className={cn("text-sm font-medium leading-tight", getPhaseColor())}>{progress.message}</p>
 
         {/* Upload/Processing details */}
         {(progress.phase === "uploading" || progress.phase === "processing") && (
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-xs text-muted-foreground">
             {uploadSpeed && (
               <div className="flex items-center gap-1">
-                <Upload className="w-3 h-3" />
+                <Upload className="w-3 h-3 flex-shrink-0" />
                 <span>{formatUploadSpeed(uploadSpeed)}</span>
               </div>
             )}
 
             {timeRemaining && timeRemaining !== Infinity && (
               <div className="flex items-center gap-1">
-                <Clock className="w-3 h-3" />
+                <Clock className="w-3 h-3 flex-shrink-0" />
                 <span>{formatTimeRemaining(timeRemaining)}</span>
               </div>
             )}
@@ -131,7 +131,9 @@ export function UploadProgressDisplay({ progress, fileName, fileSize, uploadSpee
         )}
 
         {/* Error state */}
-        {progress.phase === "error" && <p className="text-xs text-red-600">Upload failed. Please try again.</p>}
+        {progress.phase === "error" && (
+          <p className="text-xs text-red-600 leading-relaxed">Upload failed. Please try again.</p>
+        )}
       </div>
     </div>
   );

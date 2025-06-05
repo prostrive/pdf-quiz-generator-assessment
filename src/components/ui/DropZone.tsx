@@ -73,9 +73,13 @@ export function DropZone({ onFileSelect, className, disabled = false }: Props) {
   return (
     <div
       className={cn(
-        "relative border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200",
-        "hover:border-primary/50 hover:bg-muted/25",
-        isDragOver ? "border-primary bg-primary/5 scale-[1.02]" : "border-muted-foreground/25",
+        "relative border-2 border-dashed rounded-lg transition-all duration-200",
+        // Mobile-first responsive padding and sizing
+        "p-6 sm:p-8 text-center min-h-[120px] sm:min-h-[140px]",
+        // Touch-friendly hover states
+        "hover:border-primary/50 hover:bg-muted/25 active:scale-[0.98] sm:active:scale-[1.02]",
+        // Enhanced touch feedback
+        isDragOver ? "border-primary bg-primary/5 scale-[0.98] sm:scale-[1.02]" : "border-muted-foreground/25",
         disabled && "opacity-50 cursor-not-allowed",
         className
       )}
@@ -87,20 +91,25 @@ export function DropZone({ onFileSelect, className, disabled = false }: Props) {
       tabIndex={disabled ? -1 : 0}
       aria-label="Drop PDF file here"
     >
-      <div className="flex flex-col items-center gap-4 pointer-events-none">
+      <div className="flex flex-col items-center gap-3 sm:gap-4 pointer-events-none">
         {isDragOver ? (
           <div className="animate-bounce">
-            <Upload className="w-12 h-12 text-primary" />
+            <Upload className="w-10 h-10 sm:w-12 sm:h-12 text-primary" />
           </div>
         ) : (
-          <FileX className="w-12 h-12 text-muted-foreground" />
+          <FileX className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground" />
         )}
 
-        <div className="space-y-2">
-          <p className={cn("text-lg font-medium", isDragOver ? "text-primary" : "text-foreground")}>
+        <div className="space-y-1 sm:space-y-2">
+          <p
+            className={cn(
+              "text-base sm:text-lg font-medium leading-tight",
+              isDragOver ? "text-primary" : "text-foreground"
+            )}
+          >
             {isDragOver ? "Drop your PDF here" : "Drag & drop your PDF"}
           </p>
-          <p className="text-sm text-muted-foreground">Only PDF files are accepted</p>
+          <p className="text-xs sm:text-sm text-muted-foreground">Only PDF files are accepted</p>
         </div>
       </div>
       {isDragOver && (

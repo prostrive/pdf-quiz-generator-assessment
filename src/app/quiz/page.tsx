@@ -69,40 +69,36 @@ export default function QuizPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">Loading quiz...</p>
-        </div>
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+        <p className="mt-4 text-muted-foreground">Loading quiz...</p>
       </div>
     );
   }
 
   if (!quiz) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Quiz Not Found</h1>
-          <p className="text-muted-foreground mb-6">No quiz data found. Please generate a quiz first.</p>
-          <Button onClick={handleBackToHome} className="inline-flex items-center gap-2">
-            <ArrowLeft className="w-4 h-4" />
-            Back to Home
-          </Button>
-        </div>
+      <div className="text-center">
+        <h1 className="text-2xl font-bold mb-4">Quiz Not Found</h1>
+        <p className="text-muted-foreground mb-6">No quiz data found. Please generate a quiz first.</p>
+        <Button onClick={handleBackToHome} className="inline-flex items-center gap-2">
+          <ArrowLeft className="w-4 h-4" />
+          Back to Home
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-6">
-        <Button onClick={handleBackToHome} variant="outline" className="inline-flex items-center gap-2">
+    <div className="touch-manipulation">
+      <div className="mb-4 sm:mb-6">
+        <Button onClick={handleBackToHome} variant="outline" className="inline-flex items-center gap-2 min-h-[44px]">
           <ArrowLeft className="w-4 h-4" />
           Back to Home
         </Button>
       </div>
-      <div className="text-center mb-4">
-        <h1 className="text-3xl font-bold mb-2">{quiz.title || "Generated Quiz"}</h1>
+      <div className="text-center mb-3 sm:mb-4 px-2">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2 leading-tight">{quiz.title || "Generated Quiz"}</h1>
       </div>
 
       {/* Question Pagination */}
@@ -128,8 +124,8 @@ export default function QuizPage() {
         onCompletionStateChange={handleCompletionStateChange}
       />
 
-      <div className="mt-8 text-center">
-        <Button onClick={handleBackToHome} variant="outline" className="inline-flex items-center gap-2">
+      <div className="mt-6 sm:mt-8 text-center">
+        <Button onClick={handleBackToHome} variant="outline" className="inline-flex items-center gap-2 min-h-[44px]">
           <ArrowLeft className="w-4 h-4" />
           Generate New Quiz
         </Button>

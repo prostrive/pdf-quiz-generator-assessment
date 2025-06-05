@@ -17,8 +17,8 @@ export function QuestionPagination({
   disabled = false
 }: Props) {
   return (
-    <div className="space-y-3 mb-8">
-      <div className="flex flex-wrap items-center justify-center gap-2">
+    <div className="space-y-3 mb-6 sm:mb-8">
+      <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 px-2">
         {Array.from({ length: totalQuestions }, (_, index) => {
           const isAnswered = userAnswers[index] !== undefined;
           const isCurrentQuestion = index === currentQuestionIndex;

@@ -23,20 +23,33 @@ export function ErrorMessage({ type, message, dismissible = true, onDismiss, cla
   const Icon = icons[type];
 
   return (
-    <div className={cn("flex items-start gap-3 p-4 border rounded-lg", styles[type], className)} role="alert">
-      <Icon className="w-5 h-5 mt-0.5 flex-shrink-0" />
+    <div
+      className={cn(
+        "flex items-start gap-2 sm:gap-3 border rounded-lg transition-colors",
+        // Mobile-first responsive padding
+        "p-3 sm:p-4",
+        styles[type],
+        className
+      )}
+      role="alert"
+    >
+      <Icon className="w-4 h-4 sm:w-5 sm:h-5 mt-0.5 flex-shrink-0" />
       <div className="flex-1 min-w-0 mt-0.5">
-        <p className="text-sm font-medium">{message}</p>
+        <p className="text-xs sm:text-sm font-medium leading-relaxed break-words">{message}</p>
       </div>
       {dismissible && onDismiss && (
         <Button
           variant="ghost"
           size="icon"
           onClick={onDismiss}
-          className="flex-shrink-0 h-6 w-6 hover:bg-black/5 dark:hover:bg-white/5"
+          className={cn(
+            "flex-shrink-0 hover:bg-black/5 dark:hover:bg-white/5",
+            // Mobile-friendly touch target
+            "h-7 w-7 sm:h-6 sm:w-6"
+          )}
           aria-label="Dismiss"
         >
-          <X className="w-4 h-4" />
+          <X className="w-3 h-3 sm:w-4 sm:h-4" />
         </Button>
       )}
     </div>

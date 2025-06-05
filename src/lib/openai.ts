@@ -91,8 +91,8 @@ export async function testOpenAIConnection(): Promise<{
           content: "Test connection. Please respond with 'OK'."
         }
       ],
-      max_tokens: 10,
-      temperature: 0
+      max_completion_tokens: 100,
+      temperature: 1
     });
 
     if (response.choices && response.choices.length > 0) {

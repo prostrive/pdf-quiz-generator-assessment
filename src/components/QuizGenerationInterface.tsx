@@ -23,7 +23,7 @@ interface Props {
 
 export function QuizGenerationInterface({ content, isContentReady }: Props) {
   const router = useRouter();
-  const { isGenerating, currentQuiz, error, progress, canGenerate, generateQuizFromContent, reset, clearQuiz } =
+  const { isGenerating, currentQuiz, error, progress, canGenerate, generateQuizFromContent, reset } =
     useQuizGeneration();
   const [options, setOptions] = useState<QuizGenerationOptions>({
     questionCount: 5,
@@ -179,7 +179,7 @@ export function QuizGenerationInterface({ content, isContentReady }: Props) {
                 onCheckedChange={checked => setOptions(prev => ({ ...prev, includeExplanations: !!checked }))}
                 disabled={isGenerating}
               />
-              <Label htmlFor="explanations" className="text-sm">
+              <Label htmlFor="explanations" className="text-sm flex-1">
                 Include answer explanations
               </Label>
             </div>
@@ -190,7 +190,7 @@ export function QuizGenerationInterface({ content, isContentReady }: Props) {
             variant="ghost"
             size="sm"
             onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 !px-0"
             disabled={isGenerating}
           >
             <Settings className="h-4 w-4" />
@@ -212,7 +212,7 @@ export function QuizGenerationInterface({ content, isContentReady }: Props) {
                       key={area}
                       onClick={() => toggleFocusArea(area)}
                       disabled={isGenerating}
-                      className={`px-3 text-foreground py-1 text-sm rounded-full border transition-colors ${
+                      className={`px-3 text-foreground py-1 text-xs sm:text-sm rounded-full border transition-colors ${
                         selectedFocusAreas.includes(area)
                           ? "bg-primary text-primary-foreground border-primary"
                           : "bg-background hover:bg-muted border-border"
@@ -243,7 +243,7 @@ export function QuizGenerationInterface({ content, isContentReady }: Props) {
 
         {/* Success Message with Action Options */}
         {currentQuiz && !isGenerating && (
-          <div className="space-y-4 p-4 rounded-lg bg-green-50 border border-green-200">
+          <div className="sm:flex justify-between items-center gap-4 space-y-4 sm:space-y-0 p-4 rounded-lg bg-green-50 border border-green-200">
             <div className="flex items-center gap-3">
               <CheckCircle className="h-5 w-5 text-green-500" />
               <div className="flex-1">
@@ -253,23 +253,16 @@ export function QuizGenerationInterface({ content, isContentReady }: Props) {
                 </p>
               </div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex justify-center">
               <Button
                 onClick={() => {
                   // Store quiz in localStorage and navigate to quiz page
                   localStorage.setItem("currentQuiz", JSON.stringify(currentQuiz));
                   router.push("/quiz");
                 }}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                className="bg-green-600 hover:bg-green-700 text-white"
               >
                 Take Quiz
-              </Button>
-              <Button
-                variant="outline"
-                onClick={clearQuiz}
-                className="flex-1 border-green-300 text-green-700 hover:bg-green-100"
-              >
-                Generate New Quiz
               </Button>
             </div>
           </div>
