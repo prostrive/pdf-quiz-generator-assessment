@@ -141,7 +141,7 @@ export function UploadInterface({ onFileProcessed }: UploadInterfaceProps) {
     console.log("PDF Worker is ready for processing");
   };
 
-  const handleFileSelect = (file: File) => {
+  const handleFileSelect = async (file: File) => {
     // Check if PDF worker is ready
     if (!pdfWorkerReady) {
       setValidationError({
@@ -156,7 +156,7 @@ export function UploadInterface({ onFileProcessed }: UploadInterfaceProps) {
     reset(); // Clear any previous upload state
 
     // Validate the file
-    const validation = validatePDFFile(file);
+    const validation = await validatePDFFile(file);
 
     if (!validation.isValid && validation.error) {
       setValidationError(validation.error);
