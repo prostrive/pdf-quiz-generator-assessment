@@ -105,82 +105,6 @@ export function useQuizGeneration() {
   );
 
   /**
-   * Test quiz generation functionality
-   */
-  const testGeneration = useCallback(async (): Promise<{
-    success: boolean;
-    error?: string;
-  }> => {
-    setState(prev => ({
-      ...prev,
-      isGenerating: true,
-      error: null,
-      progress: {
-        phase: "generating",
-        message: "Testing quiz generation..."
-      }
-    }));
-    try {
-      console.log("🧪 Testing quiz generation...");
-
-      // Call the API route with test content
-      const testContent = "This is a test document for quiz generation testing.";
-      const testOptions = { questionCount: 2, difficulty: "medium" as const };
-
-      const response = await fetch("/api/quiz/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ content: testContent, options: testOptions })
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-
-      if (result.success && result.quiz) {
-        setState(prev => ({
-          ...prev,
-          isGenerating: false,
-          currentQuiz: result.quiz!,
-          error: null,
-          progress: {
-            phase: "complete",
-            message: "Test quiz generated successfully"
-          }
-        }));
-
-        console.log("✅ Quiz generation test passed");
-
-        return { success: true };
-      } else {
-        throw new Error(result.error || "Test generation failed");
-      }
-    } catch (error) {
-      console.error("❌ Quiz generation test failed:", error);
-      const errorMessage = error instanceof Error ? error.message : "Test failed";
-
-      setState(prev => ({
-        ...prev,
-        isGenerating: false,
-        error: errorMessage,
-        progress: {
-          phase: "error",
-          message: `Test failed: ${errorMessage}`
-        }
-      }));
-
-      return {
-        success: false,
-        error: errorMessage
-      };
-    }
-  }, []);
-
-  /**
    * Reset quiz generation state
    */
   const reset = useCallback(() => {
@@ -213,7 +137,6 @@ export function useQuizGeneration() {
     ...state,
     canGenerate,
     generateQuizFromContent,
-    testGeneration,
     reset,
     clearQuiz
   };

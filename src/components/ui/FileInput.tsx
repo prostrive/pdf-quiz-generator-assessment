@@ -1,6 +1,7 @@
 import { ChangeEvent, useRef } from "react";
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -26,7 +27,7 @@ export function FileInput({ onFileSelect, className, disabled = false }: Props) 
 
   return (
     <div className={cn("w-full", className)}>
-      <input
+      <Input
         ref={fileInputRef}
         type="file"
         accept=".pdf"
@@ -35,7 +36,6 @@ export function FileInput({ onFileSelect, className, disabled = false }: Props) 
         disabled={disabled}
         aria-label="Select PDF file"
       />
-
       <Button
         onClick={handleButtonClick}
         disabled={disabled}

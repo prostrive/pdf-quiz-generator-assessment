@@ -30,8 +30,7 @@ export function useTextExtraction() {
       error: null,
       extractedText: null,
       multiPageText: null,
-      validation: null,
-      extractionProgress: undefined
+      validation: null
     }));
 
     try {
@@ -40,17 +39,9 @@ export function useTextExtraction() {
       const pdfInfo = await getPDFInfo(file);
       console.log("✅ PDF info retrieved:", pdfInfo);
 
-      // Progress callback for multi-page extraction
-      const onProgress = (currentPage: number, totalPages: number) => {
-        setState(prev => ({
-          ...prev,
-          extractionProgress: { currentPage, totalPages }
-        }));
-      };
-
       // Extract text from all pages
       console.log("📄 Extracting text from all pages...");
-      const { fullText, pageTexts, pageCount } = await extractTextFromAllPages(file, onProgress);
+      const { fullText, pageTexts, pageCount } = await extractTextFromAllPages(file);
       console.log("✅ Text extraction completed. Full text length:", fullText.length);
 
       // Validate the extracted text
@@ -71,8 +62,7 @@ export function useTextExtraction() {
         pdfInfo,
         extractedText: null, // Single page text is not used with multi-page extraction
         multiPageText,
-        validation,
-        extractionProgress: undefined
+        validation
       });
 
       return {
@@ -86,8 +76,7 @@ export function useTextExtraction() {
       setState(prev => ({
         ...prev,
         isExtracting: false,
-        error: errorMessage,
-        extractionProgress: undefined
+        error: errorMessage
       }));
 
       return {

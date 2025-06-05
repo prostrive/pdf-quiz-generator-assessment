@@ -2,9 +2,9 @@
 
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ErrorMessage } from "@/components/ui/ErrorMessage";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { usePDFWorker } from "@/hooks/usePDFWorker";
+import { ErrorMessage } from "./ui/ErrorMessage";
+import { LoadingSpinner } from "./ui/LoadingSpinner";
 
 interface Props {
   onWorkerReady?: () => void;

@@ -1,14 +1,15 @@
 import { AlertCircle, CheckCircle, Clock, Loader2, Upload } from "lucide-react";
-import { ProgressBar } from "@/components/ui/ProgressBar";
+import { formatFileSize } from "@/lib/fileValidation";
 import { cn } from "@/lib/utils";
 import { UploadProgress } from "@/types";
+import { ProgressBar } from "./ProgressBar";
 
 interface Props {
   progress: UploadProgress;
-  fileName?: string;
-  fileSize?: number;
-  uploadSpeed?: number;
-  timeRemaining?: number;
+  fileName?: string | undefined;
+  fileSize?: number | undefined;
+  uploadSpeed?: number | undefined;
+  timeRemaining?: number | undefined;
   className?: string;
 }
 
@@ -64,16 +65,6 @@ export function UploadProgressDisplay({ progress, fileName, fileSize, uploadSpee
       default:
         return "default";
     }
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes";
-
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   const formatUploadSpeed = (bytesPerSecond: number) => {
@@ -138,9 +129,6 @@ export function UploadProgressDisplay({ progress, fileName, fileSize, uploadSpee
             )}
           </div>
         )}
-
-        {/* Completion message */}
-        {progress.phase === "complete" && <p className="text-xs text-green-600">✓ Ready for processing</p>}
 
         {/* Error state */}
         {progress.phase === "error" && <p className="text-xs text-red-600">Upload failed. Please try again.</p>}

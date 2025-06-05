@@ -1,16 +1,6 @@
-"use client";
-
-import { useState } from "react";
 import { UploadInterface } from "@/components/UploadInterface";
 
 export default function Home() {
-  const [processedFile, setProcessedFile] = useState<File | null>(null);
-
-  const handleFileProcessed = (file: File) => {
-    setProcessedFile(file);
-    console.log("PDF file processed and ready:", file.name);
-  };
-
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-center mb-12">
@@ -20,16 +10,7 @@ export default function Home() {
           assessment.
         </p>
       </div>
-
-      <UploadInterface onFileProcessed={handleFileProcessed} />
-
-      {processedFile && (
-        <div className="mt-8 text-center">
-          <p className="text-muted-foreground">
-            File processed: <span className="font-medium">{processedFile.name}</span>
-          </p>
-        </div>
-      )}
+      <UploadInterface />
     </div>
   );
 }

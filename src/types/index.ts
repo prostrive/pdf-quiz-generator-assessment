@@ -7,6 +7,7 @@ export interface Question {
   options: [string, string, string, string]; // Exactly 4 options (A, B, C, D)
   correctAnswer: 0 | 1 | 2 | 3; // Index of the correct option
   userAnswer?: 0 | 1 | 2 | 3; // User's selected answer
+  explanation?: string; // Optional explanation for the correct answer
 }
 
 export interface Quiz {
@@ -174,10 +175,6 @@ export interface TextExtractionState {
   extractedText: ExtractedText | null;
   multiPageText: MultiPageExtractedText | null;
   validation: TextValidation | null;
-  extractionProgress?: {
-    currentPage: number;
-    totalPages: number;
-  };
 }
 
 // Content preprocessing types

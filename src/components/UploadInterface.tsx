@@ -2,31 +2,33 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { DropZone } from "@/components/ui/DropZone";
-import { ErrorMessage } from "@/components/ui/ErrorMessage";
-import { FileInput } from "@/components/ui/FileInput";
-import { UploadProgressDisplay } from "@/components/ui/UploadProgressDisplay";
 import { useContentPreprocessing } from "@/hooks/useContentPreprocessing";
 import { usePDFWorker } from "@/hooks/usePDFWorker";
 import { useTextExtraction } from "@/hooks/useTextExtraction";
 import { useUploadProgress } from "@/hooks/useUploadProgress";
-import { formatFileSize, validatePDFFile } from "@/lib/fileValidation";
+import { validatePDFFile } from "@/lib/fileValidation";
 import { cn } from "@/lib/utils";
 import { MultiPageExtractedText, Quiz, PreprocessedContent as TPreprocessedContent, ValidationError } from "@/types";
 import { OpenAIClientStatus } from "./OpenAIClientStatus";
 import { PDFWorkerStatus } from "./PDFWorkerStatus";
 import { QuizGenerationInterface } from "./QuizGenerationInterface";
+import { DropZone } from "./ui/DropZone";
+import { ErrorMessage } from "./ui/ErrorMessage";
+import { FileInput } from "./ui/FileInput";
+import { UploadProgressDisplay } from "./ui/UploadProgressDisplay";
 
 interface PreprocessedContentProps {
   preprocessedContent: TPreprocessedContent;
+  isContentReady: boolean;
 }
 
 interface TextExtractionResultProps {
   multiPageText: MultiPageExtractedText;
+  isContentReady: boolean;
 }
 
 interface UploadInterfaceProps {
-  onFileProcessed: (file: File) => void;
+  onFileProcessed?: (file: File) => void;
 }
 
 interface ValidationIssueListProps {
@@ -34,49 +36,54 @@ interface ValidationIssueListProps {
   title: string;
 }
 
-function PreprocessedContent({ preprocessedContent }: PreprocessedContentProps) {
+function PreprocessedContent({ preprocessedContent, isContentReady }: PreprocessedContentProps) {
   const reducedPercentage = (
-    (1 - preprocessedContent.cleanedLength / preprocessedContent.originalLength) *
-    100
+    (1 - preprocessedContent.cleanedLength / preprocessedContent.originalLength || 0) * 100
   ).toFixed(1);
+  const textColor = isContentReady ? "text-green-700" : "text-yellow-700";
+  const valueColor = isContentReady ? "text-green-600" : "text-yellow-600";
+  const borderColor = isContentReady ? "border-green-200" : "border-yellow-200";
 
   return (
-    <div className="pt-2 border-t border-green-200">
-      <h4 className="text-xs font-semibold text-green-700 mb-2">Content Preprocessing</h4>
-      <div className="grid grid-cols-3 gap-4 text-xs">
+    <div className={cn("pt-2 border-t", borderColor)}>
+      <h4 className={cn("text-xs font-semibold mb-2", textColor)}>Content Preprocessing</h4>
+      <div className="grid grid-cols-3 gap-4 text-xs mb-3">
         <div>
-          <span className="text-green-700 font-medium">Content optimized:</span>
-          <span className="ml-1 text-green-600">{reducedPercentage}% reduced</span>
+          <span className={cn("font-medium", textColor)}>Content optimized:</span>
+          <span className={cn("ml-1", valueColor)}>{reducedPercentage}% reduced</span>
         </div>
         <div>
-          <span className="text-green-700 font-medium">Estimated tokens:</span>
-          <span className="ml-1 text-green-600">{preprocessedContent.estimatedTokens}</span>
+          <span className={cn("font-medium", textColor)}>Estimated tokens:</span>
+          <span className={cn("ml-1", valueColor)}>{preprocessedContent.estimatedTokens}</span>
         </div>
         <div>
-          <span className="text-green-700 font-medium">Sections removed:</span>
-          <span className="ml-1 text-green-600">{preprocessedContent.removedSections}</span>
+          <span className={cn("font-medium", textColor)}>Sections removed:</span>
+          <span className={cn("ml-1", valueColor)}>{preprocessedContent.removedSections}</span>
         </div>
       </div>
     </div>
   );
 }
 
-function TextExtractionResult({ multiPageText }: TextExtractionResultProps) {
+function TextExtractionResult({ multiPageText, isContentReady }: TextExtractionResultProps) {
+  const textColor = isContentReady ? "text-green-700" : "text-yellow-700";
+  const valueColor = isContentReady ? "text-green-600" : "text-yellow-600";
+
   return (
     <>
-      <h4 className="text-xs font-semibold text-green-700 mb-2">Text Extraction Results</h4>
+      <h4 className={cn("text-xs font-semibold mb-2", textColor)}>Text Extraction Results</h4>
       <div className="grid grid-cols-3 gap-4 text-xs mb-3">
         <div>
-          <span className="text-green-700 font-medium">Pages processed:</span>
-          <span className="ml-1 text-green-600">{multiPageText.pageCount}</span>
+          <span className={cn("font-medium", textColor)}>Pages processed:</span>
+          <span className={cn("ml-1", valueColor)}>{multiPageText.pageCount}</span>
         </div>
         <div>
-          <span className="text-green-700 font-medium">Words extracted:</span>
-          <span className="ml-1 text-green-600">{multiPageText.totalWordCount}</span>
+          <span className={cn("font-medium", textColor)}>Words extracted:</span>
+          <span className={cn("ml-1", valueColor)}>{multiPageText.totalWordCount}</span>
         </div>
         <div>
-          <span className="text-green-700 font-medium">Characters:</span>
-          <span className="ml-1 text-green-600">{multiPageText.totalCharCount}</span>
+          <span className={cn("font-medium", textColor)}>Characters:</span>
+          <span className={cn("ml-1", valueColor)}>{multiPageText.totalCharCount}</span>
         </div>
       </div>
     </>
@@ -99,7 +106,6 @@ function ValidationIssueList({ issues, title }: ValidationIssueListProps) {
 export function UploadInterface({ onFileProcessed }: UploadInterfaceProps) {
   const [validationError, setValidationError] = useState<ValidationError | null>(null);
   const [uploadMethod, setUploadMethod] = useState<"browse" | "drag">("browse");
-  const [generatedQuiz, setGeneratedQuiz] = useState<Quiz | null>(null);
   const { uploadState, simulateUpload, simulateProcessing, reset } = useUploadProgress();
   const { isReady: pdfWorkerReady } = usePDFWorker();
   const {
@@ -184,7 +190,7 @@ export function UploadInterface({ onFileProcessed }: UploadInterfaceProps) {
 
           if (preprocessingResult.success && preprocessingResult.content && preprocessingResult.validation?.isValid) {
             // Notify parent that file is ready for processing
-            onFileProcessed(file);
+            onFileProcessed?.(file);
           } else {
             // Handle preprocessing failure
             const issues = preprocessingResult.validation?.issues || ["Content preprocessing failed"];
@@ -214,7 +220,8 @@ export function UploadInterface({ onFileProcessed }: UploadInterfaceProps) {
   };
 
   const handleQuizGenerated = (quiz: Quiz) => {
-    setGeneratedQuiz(quiz);
+    // Store quiz in localStorage for the quiz route
+    localStorage.setItem("currentQuiz", JSON.stringify(quiz));
     console.log("Quiz generated:", quiz);
   };
 
@@ -301,24 +308,30 @@ export function UploadInterface({ onFileProcessed }: UploadInterfaceProps) {
 
       {/* Completion State */}
       {uploadState.progress.phase === "complete" && uploadState.file && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-3">
+        <div
+          className={cn(
+            "border rounded-lg p-4 space-y-3",
+            isContentReady ? "bg-green-50 border-green-200" : "bg-yellow-50 border-yellow-200"
+          )}
+        >
           <div className="flex items-center gap-3">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+            <div className={cn("w-2 h-2 rounded-full", isContentReady ? "bg-green-500" : "bg-yellow-500")}></div>
             <div className="flex-1">
-              <p className="text-sm font-medium text-green-800">Ready for quiz generation</p>
-              <p className="text-xs text-green-600">
-                {uploadState.file.name} • {formatFileSize(uploadState.file.size)}
+              <p className={cn("text-sm font-medium", isContentReady ? "text-green-800" : "text-yellow-800")}>
+                {isContentReady ? "Ready for quiz generation" : "Processing completed with issues"}
               </p>
             </div>
           </div>
 
           {/* Content Processing Results */}
           {multiPageText && extractionValidation && (
-            <div className="pt-2 border-t border-green-200">
-              <TextExtractionResult multiPageText={multiPageText} />
+            <div className={cn("pt-2 border-t", isContentReady ? "border-green-200" : "border-yellow-200")}>
+              <TextExtractionResult multiPageText={multiPageText} isContentReady={isContentReady} />
 
               {/* Content Preprocessing Results */}
-              {preprocessedContent && <PreprocessedContent preprocessedContent={preprocessedContent} />}
+              {preprocessedContent && (
+                <PreprocessedContent preprocessedContent={preprocessedContent} isContentReady={isContentReady} />
+              )}
 
               {/* Quality Issues */}
               {extractionValidation.issues.length > 0 && (
@@ -328,6 +341,17 @@ export function UploadInterface({ onFileProcessed }: UploadInterfaceProps) {
               {/* Preprocessing Issues */}
               {preprocessingValidation && preprocessingValidation.issues.length > 0 && (
                 <ValidationIssueList issues={preprocessingValidation.issues} title="Content Preprocessing Issues" />
+              )}
+
+              {/* Content Not Ready Message */}
+              {!isContentReady && (
+                <div className="mt-4 p-3 bg-yellow-100 border border-yellow-300 rounded-md">
+                  <p className="text-sm font-medium text-yellow-800 mb-1">Cannot generate quiz</p>
+                  <p className="text-xs text-yellow-700">
+                    The PDF content is not suitable for quiz generation. Please try uploading a PDF with more text
+                    content.
+                  </p>
+                </div>
               )}
             </div>
           )}
@@ -340,27 +364,6 @@ export function UploadInterface({ onFileProcessed }: UploadInterfaceProps) {
                 isContentReady={isContentReady}
                 onQuizGenerated={handleQuizGenerated}
               />
-            </div>
-          )}
-
-          {/* Generated Quiz Display */}
-          {generatedQuiz && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <div>
-                  <p className="text-sm font-medium text-blue-800">Quiz Ready!</p>
-                  <p className="text-xs text-blue-600">
-                    &quot;{generatedQuiz.title}&quot; with {generatedQuiz.questions.length} questions
-                  </p>
-                </div>
-              </div>
-              <div className="text-xs text-blue-600">
-                <p>
-                  Your quiz has been generated and is ready to use. You can now take the quiz or generate a new one with
-                  different options.
-                </p>
-              </div>
             </div>
           )}
         </div>

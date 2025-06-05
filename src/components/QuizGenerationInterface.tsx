@@ -1,18 +1,19 @@
 import { useState } from "react";
-import { AlertCircle, Brain, CheckCircle, Settings, Sparkles, Target, Zap } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { AlertCircle, Brain, CheckCircle, Settings, Sparkles, Target } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
-import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQuizGeneration } from "@/hooks/useQuizGeneration";
 import { SUGGESTED_FOCUS_AREAS } from "@/lib/quizPrompts";
 import { PreprocessedContent, Quiz, QuizGenerationOptions } from "@/types";
+import { ErrorMessage } from "./ui/ErrorMessage";
+import { LoadingSpinner } from "./ui/LoadingSpinner";
+import { ProgressBar } from "./ui/ProgressBar";
 
 interface Props {
   content: PreprocessedContent | null;
@@ -20,18 +21,10 @@ interface Props {
   onQuizGenerated?: (quiz: Quiz) => void;
 }
 
-export function QuizGenerationInterface({ content, isContentReady, onQuizGenerated }: Props) {
-  const {
-    isGenerating,
-    currentQuiz,
-    error,
-    progress,
-    canGenerate,
-    generateQuizFromContent,
-    testGeneration,
-    reset,
-    clearQuiz
-  } = useQuizGeneration();
+export function QuizGenerationInterface({ content, isContentReady }: Props) {
+  const router = useRouter();
+  const { isGenerating, currentQuiz, error, progress, canGenerate, generateQuizFromContent, reset, clearQuiz } =
+    useQuizGeneration();
   const [options, setOptions] = useState<QuizGenerationOptions>({
     questionCount: 5,
     difficulty: "medium",
@@ -51,15 +44,8 @@ export function QuizGenerationInterface({ content, isContentReady, onQuizGenerat
       ...options,
       focusAreas: selectedFocusAreas
     };
-    const result = await generateQuizFromContent(content.cleanedText, generationOptions);
 
-    if (result.success && result.quiz && onQuizGenerated) {
-      onQuizGenerated(result.quiz);
-    }
-  };
-
-  const handleTestGeneration = async () => {
-    await testGeneration();
+    await generateQuizFromContent(content.cleanedText, generationOptions);
   };
 
   const toggleFocusArea = (area: string) => {
@@ -128,7 +114,6 @@ export function QuizGenerationInterface({ content, isContentReady, onQuizGenerat
             </>
           )}
         </div>
-
         {/* Quiz Options */}
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -148,7 +133,7 @@ export function QuizGenerationInterface({ content, isContentReady, onQuizGenerat
             <div className="space-y-2">
               <Label htmlFor="question-count">Number of Questions</Label>
               <Select
-                value={options.questionCount?.toString()}
+                value={options.questionCount?.toString() || ""}
                 onValueChange={value => setOptions(prev => ({ ...prev, questionCount: parseInt(value) }))}
                 disabled={isGenerating}
               >
@@ -169,7 +154,7 @@ export function QuizGenerationInterface({ content, isContentReady, onQuizGenerat
             <div className="space-y-2">
               <Label htmlFor="difficulty">Difficulty Level</Label>
               <Select
-                value={options.difficulty}
+                value={options.difficulty || ""}
                 onValueChange={(value: "easy" | "medium" | "hard") =>
                   setOptions(prev => ({ ...prev, difficulty: value }))
                 }
@@ -190,7 +175,7 @@ export function QuizGenerationInterface({ content, isContentReady, onQuizGenerat
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="explanations"
-                checked={options.includeExplanations}
+                checked={options.includeExplanations || false}
                 onCheckedChange={checked => setOptions(prev => ({ ...prev, includeExplanations: !!checked }))}
                 disabled={isGenerating}
               />
@@ -223,19 +208,18 @@ export function QuizGenerationInterface({ content, isContentReady, onQuizGenerat
                 <p className="text-sm text-muted-foreground">Select specific areas to emphasize in questions</p>
                 <div className="flex flex-wrap gap-2">
                   {SUGGESTED_FOCUS_AREAS.map(area => (
-                    <button
+                    <Button
                       key={area}
-                      type="button"
                       onClick={() => toggleFocusArea(area)}
                       disabled={isGenerating}
-                      className={`px-3 py-1 text-sm rounded-full border transition-colors ${
+                      className={`px-3 text-foreground py-1 text-sm rounded-full border transition-colors ${
                         selectedFocusAreas.includes(area)
                           ? "bg-primary text-primary-foreground border-primary"
                           : "bg-background hover:bg-muted border-border"
                       }`}
                     >
                       {area}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -246,7 +230,6 @@ export function QuizGenerationInterface({ content, isContentReady, onQuizGenerat
         {/* Generation Progress */}
         {isGenerating && (
           <div className="space-y-3">
-            {" "}
             <div className="flex items-center gap-2">
               <LoadingSpinner size="small" />
               <p className="text-sm font-medium">{progress.message}</p>
@@ -258,24 +241,37 @@ export function QuizGenerationInterface({ content, isContentReady, onQuizGenerat
         {/* Error Display */}
         {error && <ErrorMessage message={error} type="error" dismissible onDismiss={reset} />}
 
-        {/* Success Message */}
+        {/* Success Message with Action Options */}
         {currentQuiz && !isGenerating && (
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 border border-green-200">
-            <CheckCircle className="h-5 w-5 text-green-500" />
-            <div className="flex-1">
-              <p className="font-medium text-green-800">Quiz Generated Successfully!</p>{" "}
-              <p className="text-sm text-green-600">
-                Created &quot;{currentQuiz.title}&quot; with {currentQuiz.questions.length} questions
-              </p>
+          <div className="space-y-4 p-4 rounded-lg bg-green-50 border border-green-200">
+            <div className="flex items-center gap-3">
+              <CheckCircle className="h-5 w-5 text-green-500" />
+              <div className="flex-1">
+                <p className="font-medium text-green-800">Quiz Generated Successfully!</p>
+                <p className="text-sm text-green-600">
+                  Created &quot;{currentQuiz.title}&quot; with {currentQuiz.questions.length} questions
+                </p>
+              </div>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={clearQuiz}
-              className="border-green-300 text-green-700 hover:bg-green-100"
-            >
-              Generate New
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                onClick={() => {
+                  // Store quiz in localStorage and navigate to quiz page
+                  localStorage.setItem("currentQuiz", JSON.stringify(currentQuiz));
+                  router.push("/quiz");
+                }}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+              >
+                Take Quiz
+              </Button>
+              <Button
+                variant="outline"
+                onClick={clearQuiz}
+                className="flex-1 border-green-300 text-green-700 hover:bg-green-100"
+              >
+                Generate New Quiz
+              </Button>
+            </div>
           </div>
         )}
 
@@ -288,16 +284,6 @@ export function QuizGenerationInterface({ content, isContentReady, onQuizGenerat
           >
             <Sparkles className="h-4 w-4" />
             {isGenerating ? "Generating..." : "Generate Quiz"}
-          </Button>
-
-          <Button
-            variant="outline"
-            onClick={handleTestGeneration}
-            disabled={!canGenerate}
-            className="flex items-center gap-2"
-          >
-            <Zap className="h-4 w-4" />
-            Test
           </Button>
         </div>
 

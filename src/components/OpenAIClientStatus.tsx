@@ -2,9 +2,9 @@
 
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ErrorMessage } from "@/components/ui/ErrorMessage";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useOpenAIClient } from "@/hooks/useOpenAIClient";
+import { ErrorMessage } from "./ui/ErrorMessage";
+import { LoadingSpinner } from "./ui/LoadingSpinner";
 
 interface Props {
   onClientReady?: () => void;

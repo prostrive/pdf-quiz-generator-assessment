@@ -1,3 +1,4 @@
+import { PDFInfo } from "@/types";
 import { PDFWorkerError } from "./pdfWorker";
 
 // Check if we're in a browser environment
@@ -87,13 +88,9 @@ export async function extractTextFromPage(file: File, pageNumber: number = 1): P
 /**
  * Extract text from all pages of a PDF file
  * @param file - The PDF file to extract text from
- * @param onProgress - Optional callback to track extraction progress
  * @returns Promise containing extracted text from all pages
  */
-export async function extractTextFromAllPages(
-  file: File,
-  onProgress?: (currentPage: number, totalPages: number) => void
-): Promise<{
+export async function extractTextFromAllPages(file: File): Promise<{
   fullText: string;
   pageTexts: string[];
   pageCount: number;
@@ -119,11 +116,6 @@ export async function extractTextFromAllPages(
 
     // Extract text from each page
     for (let pageNum = 1; pageNum <= pageCount; pageNum++) {
-      // Update progress if callback provided
-      if (onProgress) {
-        onProgress(pageNum, pageCount);
-      }
-
       try {
         // Get the current page
         const page = await pdf.getPage(pageNum);
@@ -185,13 +177,7 @@ export async function extractTextFromAllPages(
  * @param file - The PDF file to analyze
  * @returns Promise containing PDF metadata
  */
-export async function getPDFInfo(file: File): Promise<{
-  numPages: number;
-  fileName: string;
-  fileSize: number;
-  title?: string;
-  author?: string;
-}> {
+export async function getPDFInfo(file: File): Promise<PDFInfo> {
   if (!isBrowser) {
     throw new PDFWorkerError("PDF info extraction can only be performed in browser environment");
   }
@@ -203,19 +189,25 @@ export async function getPDFInfo(file: File): Promise<{
     const arrayBuffer = await file.arrayBuffer();
 
     // Load the PDF document
-    const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
-
-    // Get metadata
+    const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise; // Get metadata
     const metadata = await pdf.getMetadata();
     const info = (metadata.info || {}) as Record<string, string>;
 
-    return {
+    const result: PDFInfo = {
       numPages: pdf.numPages,
       fileName: file.name,
-      fileSize: file.size,
-      title: info.Title || undefined,
-      author: info.Author || undefined
+      fileSize: file.size
     };
+
+    if (info.Title) {
+      result.title = info.Title;
+    }
+
+    if (info.Author) {
+      result.author = info.Author;
+    }
+
+    return result;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     throw new PDFWorkerError(`Failed to get PDF info: ${errorMessage}`);

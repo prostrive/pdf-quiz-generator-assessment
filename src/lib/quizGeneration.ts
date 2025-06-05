@@ -190,8 +190,9 @@ function parseQuizResponse(response: string): Question[] {
         id: q.id || `q${index + 1}`,
         question: q.question.trim(),
         options: q.options.map((opt: string) => opt.trim()) as [string, string, string, string],
-        correctAnswer: q.correctAnswer as 0 | 1 | 2 | 3
-      };
+        correctAnswer: q.correctAnswer as 0 | 1 | 2 | 3,
+        explanation: q.explanation && q.explanation.trim()
+      } as Question;
     });
 
     if (questions.length === 0) {
@@ -240,7 +241,7 @@ function isNonRetryableError(error: unknown): boolean {
  * @returns Unique quiz identifier
  */
 function generateQuizId(): string {
-  return `quiz_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  return `quiz_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 }
 
 /**

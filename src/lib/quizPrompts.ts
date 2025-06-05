@@ -21,7 +21,7 @@ export function createQuizGenerationPrompt(content: string, options: QuizPromptO
 ${content}
 
 **INSTRUCTIONS:**
-- Create exactly ${questionCount} multiple-choice questions with 4 options each (A, B, C, D)
+- Create exactly ${questionCount} multiple-choice questions with 4 options each
 - Questions should be ${difficulty} difficulty level
 - ${difficultyInstructions}
 - Ensure questions test comprehension, not just memorization
@@ -36,10 +36,10 @@ ${content}
       "id": "q1",
       "question": "Clear, specific question text here?",
       "options": [
-        "Option A text",
-        "Option B text",
-        "Option C text",
-        "Option D text"
+        "First option text without letter prefix",
+        "Second option text without letter prefix",
+        "Third option text without letter prefix",
+        "Fourth option text without letter prefix"
       ],
       "correctAnswer": 0,
       "explanation": "Brief explanation (if requested)"
@@ -49,10 +49,11 @@ ${content}
 
 **IMPORTANT REQUIREMENTS:**
 - Return ONLY valid JSON, no markdown formatting or extra text
-- Use "correctAnswer" as index (0=A, 1=B, 2=C, 3=D)
+- Use "correctAnswer" as index (0=first option, 1=second option, 2=third option, 3=fourth option)
 - Each question must have exactly 4 options
 - Question text should end with a question mark
 - Keep options concise but descriptive
+- Do NOT include letter prefixes (A, B, C, D) in option text - provide clean option text only
 - Ensure grammatical correctness
 
 Generate the quiz now:`;
