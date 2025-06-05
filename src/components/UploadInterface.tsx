@@ -6,7 +6,7 @@ import { useContentPreprocessing } from "@/hooks/useContentPreprocessing";
 import { usePDFWorker } from "@/hooks/usePDFWorker";
 import { useTextExtraction } from "@/hooks/useTextExtraction";
 import { useUploadProgress } from "@/hooks/useUploadProgress";
-import { validatePDFFile } from "@/lib/fileValidation";
+import { FILE_VALIDATION_CONFIG, formatFileSize, validatePDFFile } from "@/lib/fileValidation";
 import { cn } from "@/lib/utils";
 import { MultiPageExtractedText, Quiz, PreprocessedContent as TPreprocessedContent, ValidationError } from "@/types";
 import { OpenAIClientStatus } from "./OpenAIClientStatus";
@@ -269,8 +269,9 @@ export function UploadInterface({ onFileProcessed }: UploadInterfaceProps) {
           <h3 className="text-sm font-medium mb-2">File Requirements:</h3>
           <ul className="text-xs text-muted-foreground space-y-1">
             <li>• File format: PDF only</li>
-            <li>• Maximum size: 10MB</li>
+            <li>• Maximum size: {formatFileSize(FILE_VALIDATION_CONFIG.maxFileSize)}</li>
             <li>• Text-based PDFs work best for quiz generation</li>
+            <li>• Recommended size: Under {formatFileSize(3 * 1024 * 1024)} for faster processing</li>
           </ul>
         </div>
       )}

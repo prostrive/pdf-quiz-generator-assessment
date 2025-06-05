@@ -7,7 +7,7 @@ const OPENAI_CONFIG = {
   // Maximum retries for failed requests
   maxRetries: 3,
   // Model to use for quiz generation
-  model: "gpt-3.5-turbo" as const,
+  model: process.env.OPENAI_MODEL || "gpt-4",
   // Maximum tokens for response
   maxTokens: 1500,
   // Temperature for response creativity (0.1 for more deterministic responses)
