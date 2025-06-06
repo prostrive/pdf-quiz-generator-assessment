@@ -257,3 +257,69 @@ The project includes:
 - **File Validation**: Comprehensive validation prevents malicious uploads
 - **Input Sanitization**: All user inputs are validated and sanitized
 - **Error Handling**: Graceful error handling prevents information leakage
+
+## ⚠️ Known Limitations and Areas for Improvement
+
+### Current Limitations
+
+#### 1. PDF Processing Constraints
+
+- **Text-only PDFs**: Cannot extract text from scanned/image-based PDFs
+- **Complex Layouts**: Tables, charts, and multi-column layouts may be misinterpreted
+- **File Size Limits**: 10MB browser memory constraints
+- **Language Support**: Optimized for English content only
+
+#### 2. AI Generation Dependencies
+
+- **API Reliability**: Requires stable internet connection and OpenAI service availability
+- **Cost Implications**: Each quiz generation consumes API tokens (~1,000-3,000 tokens)
+- **Quality Variance**: AI-generated questions may vary in relevance and difficulty
+- **Rate Limits**: Subject to OpenAI's usage quotas (typically 3 requests/minute for free tier)
+
+#### 3. Question Validation Limitations
+
+- **Short-Answer Scoring**: Basic text matching without semantic understanding
+- **No Partial Credit**: Binary correct/incorrect scoring only
+- **Limited Acceptable Answers**: Must manually define answer variations in AI prompt
+
+#### 4. User Experience Gaps
+
+- **No Question Editing**: Cannot modify questions after generation
+- **No Question Preview**: Cannot review all questions before starting quiz
+
+### Areas for Improvement
+
+#### High Priority Enhancements
+
+1. **Advanced Answer Validation**
+
+   ```typescript
+   // Semantic similarity scoring for short answers
+   const similarity = await openai.embeddings.create({
+     input: [correctAnswer, userAnswer],
+     model: "text-embedding-ada-002"
+   });
+   ```
+
+2. **OCR Integration**
+   ```typescript
+   // Support for image-based PDFs
+   import Tesseract from "tesseract.js";
+   const extractTextFromImages = async (pdfImages: ImageData[]) => {
+     // OCR processing logic
+   };
+   ```
+
+#### Medium Priority Features
+
+- **Export Capabilities**: PDF/Word export of generated quizzes
+- **Batch Processing**: Multiple PDF upload and processing
+- **Analytics Dashboard**: Question performance and user statistics
+
+#### Technical Debt and Refactoring
+
+- **Monitoring**: Error tracking (Sentry), performance monitoring
+- **Testing**: Unit tests, integration tests, E2E tests
+- **CI/CD**: Automated testing and deployment pipeline
+- **Performance**: Virtualization for large question sets
+- **Internationalization**: Multi-language support
