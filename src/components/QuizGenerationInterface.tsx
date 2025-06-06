@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQuizGeneration } from "@/hooks/useQuizGeneration";
 import { SUGGESTED_FOCUS_AREAS } from "@/lib/quizPrompts";
-import { PreprocessedContent, Quiz, QuizGenerationOptions } from "@/types";
+import { PreprocessedContent, Quiz, QuizGenerationOptions, QuestionType } from "@/types";
 import { ErrorMessage } from "./ui/ErrorMessage";
 import { LoadingSpinner } from "./ui/LoadingSpinner";
 import { ProgressBar } from "./ui/ProgressBar";
@@ -30,7 +30,9 @@ export function QuizGenerationInterface({ content, isContentReady }: Props) {
     difficulty: "medium",
     includeExplanations: false,
     title: "Generated Quiz",
-    focusAreas: []
+    focusAreas: [],
+    questionTypes: ["multiple-choice"],
+    shortAnswerRatio: 0
   });
   const [selectedFocusAreas, setSelectedFocusAreas] = useState<string[]>([]);
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
@@ -183,6 +185,80 @@ export function QuizGenerationInterface({ content, isContentReady }: Props) {
                 Include answer explanations
               </Label>
             </div>
+
+            {/* Question Types */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Question Types</Label>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="multiple-choice"
+                    checked={options.questionTypes?.includes("multiple-choice") || false}
+                    onCheckedChange={checked => {
+                      const currentTypes = options.questionTypes || ["multiple-choice"];
+                      const newTypes = checked
+                        ? [...currentTypes.filter(t => t !== "multiple-choice"), "multiple-choice" as QuestionType]
+                        : currentTypes.filter(t => t !== "multiple-choice");
+
+                      setOptions(prev => ({
+                        ...prev,
+                        questionTypes: newTypes.length > 0 ? newTypes : ["short-answer" as QuestionType],
+                        shortAnswerRatio: checked ? 0.5 : 1
+                      }));
+                    }}
+                    disabled={isGenerating}
+                  />
+                  <Label htmlFor="multiple-choice" className="text-sm flex-1">
+                    Multiple Choice Questions
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="short-answer"
+                    checked={options.questionTypes?.includes("short-answer") || false}
+                    onCheckedChange={checked => {
+                      const currentTypes = options.questionTypes || ["short-answer"];
+                      const newTypes = checked
+                        ? [...currentTypes.filter(t => t !== "short-answer"), "short-answer" as QuestionType]
+                        : currentTypes.filter(t => t !== "short-answer");
+
+                      setOptions(prev => ({
+                        ...prev,
+                        questionTypes: newTypes.length > 0 ? newTypes : ["multiple-choice" as QuestionType],
+                        shortAnswerRatio: checked ? 0.5 : 0
+                      }));
+                    }}
+                    disabled={isGenerating}
+                  />
+                  <Label htmlFor="short-answer" className="text-sm flex-1">
+                    Short Answer Questions
+                  </Label>
+                </div>
+              </div>
+            </div>
+
+            {/* Short Answer Ratio */}
+            {options.questionTypes?.includes("short-answer") && options.questionTypes?.includes("multiple-choice") && (
+              <div className="space-y-2">
+                <Label htmlFor="short-answer-ratio" className="text-sm font-medium">
+                  Short Answer Ratio ({Math.round((options.shortAnswerRatio || 0) * 100)}%)
+                </Label>
+                <Input
+                  id="short-answer-ratio"
+                  type="range"
+                  min="0.01"
+                  max="0.99"
+                  step="0.01"
+                  value={options.shortAnswerRatio || 0}
+                  onChange={e => setOptions(prev => ({ ...prev, shortAnswerRatio: parseFloat(e.target.value) }))}
+                  disabled={isGenerating}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer p-0"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Controls the mix of question types. 0% = all multiple choice, 100% = all short answer.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Advanced Options Toggle */}
@@ -190,7 +266,7 @@ export function QuizGenerationInterface({ content, isContentReady }: Props) {
             variant="ghost"
             size="sm"
             onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}
-            className="flex items-center gap-2 !px-0"
+            className="flex items-center gap-2"
             disabled={isGenerating}
           >
             <Settings className="h-4 w-4" />

@@ -1,14 +1,35 @@
 import { getPDFWorkerConfig } from "@/lib/pdfWorker";
 
 // Core quiz types
-export interface Question {
+export type QuestionType = "multiple-choice" | "short-answer";
+
+export type OptionIndex = 0 | 1 | 2 | 3; // For multiple-choice options (A, B, C, D)
+
+export interface BaseQuestion {
   id: string;
   question: string;
-  options: [string, string, string, string]; // Exactly 4 options (A, B, C, D)
-  correctAnswer: 0 | 1 | 2 | 3; // Index of the correct option
-  userAnswer?: 0 | 1 | 2 | 3; // User's selected answer
+  type: QuestionType;
   explanation?: string; // Optional explanation for the correct answer
 }
+
+export interface MultipleChoiceQuestion extends BaseQuestion {
+  type: "multiple-choice";
+  options: [string, string, string, string]; // Exactly 4 options (A, B, C, D)
+  correctAnswer: OptionIndex; // Index of the correct option
+  userAnswer?: OptionIndex; // User's selected answer
+}
+
+export interface ShortAnswerQuestion extends BaseQuestion {
+  type: "short-answer";
+  correctAnswer: string; // The expected answer
+  acceptableAnswers?: string[]; // Alternative acceptable answers
+  userAnswer?: string; // User's text input
+  maxLength?: number; // Maximum character length for answer
+}
+
+export type Question = MultipleChoiceQuestion | ShortAnswerQuestion;
+
+export type UserAnswer = Question["userAnswer"];
 
 export interface Quiz {
   id: string;
@@ -36,13 +57,26 @@ export interface QuizGenerationResponse {
 }
 
 // Add interfaces for parsed response
-export interface ParsedQuestionResponse {
+export interface ParsedMultipleChoiceQuestionResponse {
   id?: string;
+  type: "multiple-choice";
   question: string;
   options: string[];
   correctAnswer: number;
   explanation?: string;
 }
+
+export interface ParsedShortAnswerQuestionResponse {
+  id?: string;
+  type: "short-answer";
+  question: string;
+  correctAnswer: string;
+  acceptableAnswers?: string[];
+  explanation?: string;
+  maxLength?: number;
+}
+
+export type ParsedQuestionResponse = ParsedMultipleChoiceQuestionResponse | ParsedShortAnswerQuestionResponse;
 
 export interface ParsedQuizResponse {
   questions: ParsedQuestionResponse[];
@@ -53,6 +87,8 @@ export interface QuizPromptOptions {
   difficulty?: "easy" | "medium" | "hard";
   includeExplanations?: boolean;
   focusAreas?: string[];
+  questionTypes?: QuestionType[]; // Types of questions to generate
+  shortAnswerRatio?: number; // Ratio of short-answer to multiple-choice (0-1)
 }
 
 export interface QuizGenerationOptions extends QuizPromptOptions {

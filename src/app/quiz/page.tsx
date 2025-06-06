@@ -6,13 +6,13 @@ import { useRouter } from "next/navigation";
 import { QuestionPagination } from "@/components/QuestionPagination";
 import { QuizDisplay } from "@/components/QuizDisplay";
 import { Button } from "@/components/ui/button";
-import { Quiz } from "@/types";
+import { Quiz, UserAnswer } from "@/types";
 
 export default function QuizPage() {
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [userAnswers, setUserAnswers] = useState<(number | undefined)[]>([]);
+  const [userAnswers, setUserAnswers] = useState<UserAnswer[]>([]);
   const [showResults, setShowResults] = useState(false);
   const router = useRouter();
 
@@ -45,7 +45,7 @@ export default function QuizPage() {
     setCurrentQuestionIndex(index);
   };
 
-  const handleAnswerSelect = (answerIndex: number) => {
+  const handleAnswerSelect = (answerIndex: UserAnswer) => {
     const newAnswers = [...userAnswers];
     newAnswers[currentQuestionIndex] = answerIndex;
     setUserAnswers(newAnswers);

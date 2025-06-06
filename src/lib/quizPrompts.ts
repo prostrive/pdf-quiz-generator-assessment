@@ -7,7 +7,14 @@ import { QuizPromptOptions } from "@/types";
  * @returns Formatted prompt for OpenAI API
  */
 export function createQuizGenerationPrompt(content: string, options: QuizPromptOptions = {}): string {
-  const { questionCount = 5, difficulty = "medium", includeExplanations = false, focusAreas = [] } = options;
+  const {
+    questionCount = 5,
+    difficulty = "medium",
+    includeExplanations = false,
+    focusAreas = [],
+    questionTypes = ["multiple-choice"],
+    shortAnswerRatio = 0
+  } = options;
   const difficultyInstructions = getDifficultyInstructions(difficulty);
   const focusInstructions =
     focusAreas.length > 0 ? `\n\nFocus the questions on these specific areas: ${focusAreas.join(", ")}` : "";
@@ -15,17 +22,52 @@ export function createQuizGenerationPrompt(content: string, options: QuizPromptO
     ? `\n- Include a brief explanation for why each correct answer is right`
     : "";
 
-  return `You are an expert educational content creator. Your task is to generate ${questionCount} high-quality multiple-choice questions based on the provided text content.
+  // Calculate question distribution
+  const hasMultipleChoice = questionTypes.includes("multiple-choice");
+  const hasShortAnswer = questionTypes.includes("short-answer");
+
+  let questionDistribution = "";
+  let questionTypeOrder = "";
+
+  if (hasMultipleChoice && hasShortAnswer) {
+    const shortAnswerCount = Math.round(questionCount * shortAnswerRatio);
+    const multipleChoiceCount = questionCount - shortAnswerCount;
+    questionDistribution = `
+- Generate EXACTLY ${multipleChoiceCount} multiple-choice questions (each with exactly 4 options)
+- Generate EXACTLY ${shortAnswerCount} short-answer questions (requiring brief text responses)
+- TOTAL: ${questionCount} questions`;
+
+    // Create explicit ordering
+    const questionOrder = [];
+
+    for (let i = 0; i < questionCount; i++) {
+      if (i < shortAnswerCount) {
+        questionOrder.push(`Question ${i + 1}: short-answer type`);
+      } else {
+        questionOrder.push(`Question ${i + 1}: multiple-choice type`);
+      }
+    }
+
+    questionTypeOrder = `\n\nEXACT QUESTION TYPE ORDER:\n${questionOrder.join("\n")}`;
+  } else if (hasShortAnswer) {
+    questionDistribution = `- Generate EXACTLY ${questionCount} short-answer questions (requiring brief text responses)`;
+    questionTypeOrder = `\n\nALL ${questionCount} questions must be short-answer type.`;
+  } else {
+    questionDistribution = `- Generate EXACTLY ${questionCount} multiple-choice questions (each with exactly 4 options)`;
+    questionTypeOrder = `\n\nALL ${questionCount} questions must be multiple-choice type.`;
+  }
+
+  return `You are an expert educational content creator. Your task is to generate ${questionCount} high-quality questions based on the provided text content.
 
 **CONTENT TO ANALYZE:**
 ${content}
 
 **INSTRUCTIONS:**
-- Create exactly ${questionCount} multiple-choice questions with 4 options each
+${questionDistribution}${questionTypeOrder}
 - Questions should be ${difficulty} difficulty level
 - ${difficultyInstructions}
 - Ensure questions test comprehension, not just memorization
-- Make incorrect options plausible but clearly wrong
+- Make incorrect options plausible but clearly wrong (for multiple-choice)
 - Avoid questions that require external knowledge not in the content
 - Questions should be diverse and cover different parts of the content${focusInstructions}${explanationInstructions}
 
@@ -34,6 +76,7 @@ ${content}
   "questions": [
     {
       "id": "q1",
+      "type": "multiple-choice",
       "question": "Clear, specific question text here?",
       "options": [
         "First option text without letter prefix",
@@ -43,18 +86,32 @@ ${content}
       ],
       "correctAnswer": 0,
       "explanation": "Brief explanation (if requested)"
+    },
+    {
+      "id": "q2",
+      "type": "short-answer",
+      "question": "What is the main concept discussed in the second paragraph?",
+      "correctAnswer": "The primary answer expected",
+      "acceptableAnswers": ["Alternative acceptable answer 1", "Alternative acceptable answer 2"],
+      "maxLength": 100,
+      "explanation": "Brief explanation (if requested)"
     }
   ]
 }
 
 **IMPORTANT REQUIREMENTS:**
 - Return ONLY valid JSON, no markdown formatting or extra text
-- Use "correctAnswer" as index (0=first option, 1=second option, 2=third option, 3=fourth option)
-- Each question must have exactly 4 options
+- STRICTLY follow the question type distribution specified above
+- For multiple-choice: Use "type": "multiple-choice" and "correctAnswer" as index (0=first option, 1=second option, 2=third option, 3=fourth option)
+- For short-answer: Use "type": "short-answer" and "correctAnswer" as the expected text answer
+- Include "acceptableAnswers" array for short-answer questions with alternative valid responses
+- Each multiple-choice question must have exactly 4 options
 - Question text should end with a question mark
-- Keep options concise but descriptive
+- Keep options concise but descriptive (for multiple-choice)
 - Do NOT include letter prefixes (A, B, C, D) in option text - provide clean option text only
+- For short-answer questions, set reasonable "maxLength" (50-200 characters typically)
 - Ensure grammatical correctness
+- DO NOT deviate from the specified question types and counts
 
 Generate the quiz now:`;
 }

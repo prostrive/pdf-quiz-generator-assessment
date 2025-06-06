@@ -1,4 +1,4 @@
-import { makeOpenAIRequest } from "./openai";
+import { makeOpenAIRequest, OPENAI_CONFIG } from "./openai";
 import { createQuizGenerationPrompt, validateQuizPromptInputs } from "./quizPrompts";
 import {
   Quiz,
@@ -25,8 +25,10 @@ export async function generateQuiz(
     includeExplanations = false,
     focusAreas = [],
     title = "Generated Quiz",
-    model = "gpt-3.5-turbo",
-    maxRetries = 3
+    model = OPENAI_CONFIG.model,
+    maxRetries = 3,
+    questionTypes = ["multiple-choice"],
+    shortAnswerRatio = 0
   } = options;
 
   try {
@@ -34,7 +36,9 @@ export async function generateQuiz(
       contentLength: content.length,
       questionCount,
       difficulty,
-      model
+      model,
+      questionTypes,
+      shortAnswerRatio
     });
 
     // Validate inputs
@@ -57,7 +61,9 @@ export async function generateQuiz(
       questionCount,
       difficulty,
       includeExplanations,
-      focusAreas
+      focusAreas,
+      questionTypes,
+      shortAnswerRatio
     });
 
     // Make API request with retries
@@ -173,26 +179,50 @@ function parseQuizResponse(response: string): Question[] {
     }
 
     const questions: Question[] = parsed.questions.map((q: ParsedQuestionResponse, index: number) => {
-      // Validate question structure
+      // Validate common fields
       if (!q.question || typeof q.question !== "string") {
         throw new Error(`Question ${index + 1}: Invalid or missing question text`);
       }
 
-      if (!q.options || !Array.isArray(q.options) || q.options.length !== 4) {
-        throw new Error(`Question ${index + 1}: Must have exactly 4 options`);
+      if (!q.type || (q.type !== "multiple-choice" && q.type !== "short-answer")) {
+        throw new Error(`Question ${index + 1}: Invalid or missing question type`);
       }
 
-      if (typeof q.correctAnswer !== "number" || q.correctAnswer < 0 || q.correctAnswer > 3) {
-        throw new Error(`Question ${index + 1}: correctAnswer must be 0, 1, 2, or 3`);
-      }
-
-      return {
+      const baseQuestion = {
         id: q.id || `q${index + 1}`,
         question: q.question.trim(),
-        options: q.options.map((opt: string) => opt.trim()) as [string, string, string, string],
-        correctAnswer: q.correctAnswer as 0 | 1 | 2 | 3,
+        type: q.type,
         explanation: q.explanation && q.explanation.trim()
-      } as Question;
+      };
+
+      if (q.type === "multiple-choice") {
+        if (!q.options || !Array.isArray(q.options) || q.options.length !== 4) {
+          throw new Error(`Question ${index + 1}: Must have exactly 4 options for multiple-choice`);
+        }
+
+        if (typeof q.correctAnswer !== "number" || q.correctAnswer < 0 || q.correctAnswer > 3) {
+          throw new Error(`Question ${index + 1}: correctAnswer must be 0, 1, 2, or 3 for multiple-choice`);
+        }
+
+        return {
+          ...baseQuestion,
+          type: "multiple-choice",
+          options: q.options.map((opt: string) => opt.trim()) as [string, string, string, string],
+          correctAnswer: q.correctAnswer as 0 | 1 | 2 | 3
+        };
+      } else {
+        if (!q.correctAnswer || typeof q.correctAnswer !== "string") {
+          throw new Error(`Question ${index + 1}: Must have a valid correctAnswer string for short-answer`);
+        }
+
+        return {
+          ...baseQuestion,
+          type: "short-answer",
+          correctAnswer: q.correctAnswer.trim(),
+          acceptableAnswers: q.acceptableAnswers?.map((ans: string) => ans.trim()),
+          maxLength: q.maxLength || 200
+        };
+      }
     });
 
     if (questions.length === 0) {

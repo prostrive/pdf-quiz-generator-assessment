@@ -4,15 +4,15 @@ import { QuestionDisplay } from "@/components/QuestionDisplay";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { Quiz } from "@/types";
+import { Quiz, UserAnswer } from "@/types";
 
 interface Props {
   quiz: Quiz;
   currentQuestionIndex: number;
-  userAnswers: (number | undefined)[];
+  userAnswers: UserAnswer[];
   onQuestionChange: (index: number) => void;
-  onAnswerSelect: (answerIndex: number) => void;
-  onQuizComplete?: (score: number, answers: (number | undefined)[]) => void;
+  onAnswerSelect: (answerIndex: UserAnswer) => void;
+  onQuizComplete?: (score: number, answers: UserAnswer[]) => void;
   onRestart?: () => void;
   onCompletionStateChange?: (showResults: boolean) => void;
   className?: string;
@@ -36,8 +36,9 @@ export function QuizDisplay({
   const isLastQuestion = currentQuestionIndex === quiz.questions.length - 1;
   const allQuestionsAnswered = userAnswers.every(answer => answer !== undefined);
 
-  const handleAnswerSelect = (answerIndex: number) => {
+  const handleAnswerSelect = (answerIndex: UserAnswer) => {
     if (isCompleted) return;
+
     onAnswerSelect(answerIndex);
   };
 
@@ -70,8 +71,35 @@ export function QuizDisplay({
     let correct = 0;
 
     quiz.questions.forEach((question, index) => {
-      if (userAnswers[index] === question.correctAnswer) {
-        correct++;
+      const userAnswer = userAnswers[index];
+
+      if (userAnswer === undefined) return;
+
+      if (question.type === "multiple-choice") {
+        if (userAnswer === question.correctAnswer) {
+          correct++;
+        }
+      } else if (question.type === "short-answer") {
+        const userText = userAnswer.toString();
+
+        if (userText) {
+          const normalizedUserAnswer = userText.toLowerCase().trim();
+          const normalizedCorrectAnswer = question.correctAnswer.toLowerCase().trim();
+
+          // Check exact match first
+          if (normalizedUserAnswer === normalizedCorrectAnswer) {
+            correct++;
+          } else if (question.acceptableAnswers) {
+            // Check acceptable answers
+            const isAcceptable = question.acceptableAnswers.some(
+              acceptable => normalizedUserAnswer === acceptable.toLowerCase().trim()
+            );
+
+            if (isAcceptable) {
+              correct++;
+            }
+          }
+        }
       }
     });
 

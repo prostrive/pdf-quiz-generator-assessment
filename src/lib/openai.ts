@@ -92,7 +92,7 @@ export async function testOpenAIConnection(): Promise<{
         }
       ],
       max_completion_tokens: 100,
-      temperature: 1
+      temperature: 0.1
     });
 
     if (response.choices && response.choices.length > 0) {
@@ -164,4 +164,4 @@ export async function makeOpenAIRequest<T>(requestFn: (client: OpenAI) => Promis
 }
 
 // Export the client getter function
-export { getOpenAIClient };
+export { getOpenAIClient, OPENAI_CONFIG };

@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { UserAnswer } from "@/types";
 
 interface Props {
   totalQuestions: number;
   currentQuestionIndex: number;
-  userAnswers: (number | undefined)[];
+  userAnswers: UserAnswer[];
   onQuestionSelect: (index: number) => void;
   disabled?: boolean;
 }
