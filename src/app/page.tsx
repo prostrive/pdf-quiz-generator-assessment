@@ -23,7 +23,6 @@ export default function Home() {
         <FileUpload
           onFileChange={(file) => {
             setSelectedFile(file);
-            if (file) extractText(file);
           }}
           selectedFile={selectedFile}
           disabled={loading}
@@ -37,7 +36,6 @@ export default function Home() {
         >
           {loading ? "Extracting..." : "Upload PDF"}
         </Button>
-        {selectedFile && <p className="text-sm text-gray-600">Selected: {selectedFile.name}</p>}
         {loading && <LoadingSpinner className="my-4" />}
         {error && <ErrorAlert message={error} />}
         {pdfText && !quiz && (
