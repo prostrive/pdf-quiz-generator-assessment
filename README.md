@@ -1,47 +1,65 @@
-# PDF Quiz Generator - Take-Home Assignment
+# PDF Quiz Generator
 
-## Challenge Overview
-Create a simple web application that allows users to upload PDF documents and generate a quiz based on the content using OpenAI.
+A web app that allows users to upload a PDF file (max 10 pages) and automatically generates a multiple-choice quiz based on its content using LLMs. Built with **Next.js**, **React**, **Zod**, and **pdf.js**, powered by **Groq LLaMA 4** for fast and intelligent AI-driven quiz generation.
+
+---
+
+## Installation & Setup
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/yourusername/pdf-quiz-generator.git
+cd pdf-quiz-generator
+```
+
+### 2. Install dependencies
+```bash
+npm install
+```
+
+### 3. Add your Groq API key
+Create a `.env.local` file in the root directory:
+```bash
+AI_API_KEY=your_groq_api_key_here
+```
+> You can get your Groq key from: https://console.groq.com/
+
+### 4. Run the development server
+```bash
+npm run dev
+```
+
+Open http://localhost:3000 to use the app.
+
+---
 
 ## Tech Stack
-This starter project uses Next.js with Tailwind CSS and Shadcn UI components.
 
-## Core Requirements
+| Tech            | Usage                          |
+|-----------------|--------------------------------|
+| Next.js         | App framework                  |
+| React           | Frontend UI                    |
+| pdf.js          | PDF text parsing               |
+| Groq + LLaMA 4  | AI quiz generation             |
+| React Hook Form | Form validation                |
+| Zod             | Schema validation              |
+| Sonner          | Toast notification system      |
+| Tailwind CSS    | (Optional) Styling             |
 
-### Minimum Viable Product
-- Upload interface for PDF documents (limit to small files, <10 pages)
-- Generate 5 multiple-choice questions using OpenAI based on PDF content
-- Allow users to answer questions and see their score
+---
 
-### Stretch Goals (if time permits)
-- Support for larger documents
-- Short-answer question types
-- Improved error handling
-- Enhanced visual design
+## Approach & Design Decisions
 
-## Implementation Guidelines
-- Focus on creating a working prototype rather than a polished product
-- Use the OpenAI API efficiently (consider extracting key sections rather than sending the entire document)
-- Basic error handling for common cases (invalid PDFs, API failures)
-- Keep the UI simple and functional
+- **Client-side PDF parsing:** Using `pdf.js` allows us to extract text directly in the browser, preventing file uploads to a server and ensuring privacy and responsiveness.
+- **AI prompt engineering:** The extracted content is sent to the Groq-hosted LLaMA 4 model with carefully crafted instructions to return only structured JSON.
+- **Zod + React Hook Form:** Ensures that file input is validated and errors are handled cleanly.
+- **Quiz structure:** A minimal quiz UI presents one question at a time, tracks score, and offers reset on completion.
+- **Separation of concerns:** Parsing, quiz generation, form handling, and UI rendering are modularized for clarity and reuse.
 
-## Resources
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-- [Shadcn UI Documentation](https://ui.shadcn.com)
-- [OpenAI API Documentation](https://platform.openai.com/docs/api-reference)
-- [PDF.js Library](https://mozilla.github.io/pdf.js/) (suggestion for PDF processing)
-
-## Evaluation Criteria
-- Functional completeness of the core features
-- Code organization and clarity
-- Thoughtful API integration
-- Basic user experience considerations
-
-## Timeline
-- Expected completion: 2-3 hours of focused development
-- Deadline: Within 5 days of receiving this assignment
-
-This assignment is designed to demonstrate your approach to problem-solving and integration rather than creating a production-ready application. We're interested in seeing your programming style and how you tackle the essential requirements within the time constraint.
-
-Good luck! We're excited to see your implementation.
+## Known Limitations
+- Only supports PDFs with 10 pages or less (hard-coded limit).
+- PDF must contain text, not scanned images.
+- No persistent storage — quizzes are lost on refresh.
+- Generated questions may be inaccurate if PDF content is vague or complex.
+- No support for open-ended questions or answer explanations (yet).
