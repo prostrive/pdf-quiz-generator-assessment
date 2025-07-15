@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-4o',
         messages: [
           { role: 'system', content: 'You are a helpful assistant that generates quizzes.' },
           { role: 'user', content: prompt },
@@ -73,7 +73,12 @@ export async function POST(req: NextRequest) {
     const content = data.choices?.[0]?.message?.content;
     let quiz;
     try {
-      quiz = JSON.parse(content);
+      // Use [\s\S] instead of /s flag for compatibility
+      const match = content.match(/\[[\s\S]*\]/);
+      if (!match) {
+        return NextResponse.json({ error: 'Failed to find JSON array in OpenAI response.' }, { status: 500 });
+      }
+      quiz = JSON.parse(match[0]);
     } catch {
       return NextResponse.json({ error: 'Failed to parse OpenAI response as JSON.' }, { status: 500 });
     }
