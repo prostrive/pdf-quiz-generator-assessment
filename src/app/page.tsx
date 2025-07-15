@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import QuizContainer from "@/components/QuizContainer";
 import ExtractedText from "@/components/ExtractedText";
 import GenerateQuizButton from "@/components/GenerateQuizButton";
+import FileUpload from "@/components/FileUpload";
 import type { QuizQuestion } from "@/types/quiz";
 
 export default function Home() {
@@ -15,16 +16,6 @@ export default function Home() {
   const [quiz, setQuiz] = useState<QuizQuestion[] | null>(null);
   const [quizLoading, setQuizLoading] = useState(false);
   const [quizError, setQuizError] = useState("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Handle file selection
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
-      setPdfText("");
-      setError("");
-    }
-  };
 
   // Extract text from PDF using PDF.js
   const extractTextFromPDF = async (file: File) => {
@@ -93,18 +84,15 @@ export default function Home() {
     <main className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <h1 className="text-4xl font-bold">PDF Quiz Generator</h1>
       <section className="flex flex-col items-center gap-4 w-full max-w-xl">
-        <label htmlFor="pdf-upload" className="sr-only">Upload PDF</label>
-        <div className="flex justify-center w-full">
-          <input
-            id="pdf-upload"
-            type="file"
-            accept="application/pdf"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            aria-label="Upload PDF file"
-            className="block w-full max-w-xs text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-          />
-        </div>
+        <FileUpload
+          onFileChange={(file) => {
+            setSelectedFile(file);
+            setPdfText("");
+            setError("");
+          }}
+          selectedFile={selectedFile}
+          disabled={loading}
+        />
         <Button
           disabled={!selectedFile || loading}
           onClick={() => selectedFile && extractTextFromPDF(selectedFile)}
