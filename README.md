@@ -9,7 +9,7 @@ A web app that allows users to upload a PDF file (max 10 pages) and automaticall
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/pdf-quiz-generator.git
+git clone https://github.com/CnRXomoX/pdf-quiz-generator.git
 cd pdf-quiz-generator
 ```
 
