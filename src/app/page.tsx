@@ -1,13 +1,10 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-
-type QuizQuestion = {
-  question: string;
-  options: string[];
-  answer: string;
-};
+import QuizContainer, { QuizQuestion } from "@/components/QuizContainer";
+import ExtractedText from "@/components/ExtractedText";
+import GenerateQuizButton from "@/components/GenerateQuizButton";
 
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -18,9 +15,6 @@ export default function Home() {
   const [quizLoading, setQuizLoading] = useState(false);
   const [quizError, setQuizError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [userAnswers, setUserAnswers] = useState<string[]>([]);
-  const [quizSubmitted, setQuizSubmitted] = useState(false);
-  const [score, setScore] = useState<number | null>(null);
 
   // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,33 +88,6 @@ export default function Home() {
     }
   };
 
-  // Handle answer selection
-  const handleSelectAnswer = (qIdx: number, answer: string) => {
-    setUserAnswers((prev) => {
-      const updated = [...prev];
-      updated[qIdx] = answer;
-      return updated;
-    });
-  };
-
-  // Handle quiz submission
-  const handleSubmitQuiz = () => {
-    if (!quiz) return;
-    let correct = 0;
-    quiz.forEach((q, idx) => {
-      if (userAnswers[idx] === q.answer) correct++;
-    });
-    setScore(correct);
-    setQuizSubmitted(true);
-  };
-
-  // Reset quiz state if new quiz is generated
-  useEffect(() => {
-    setUserAnswers([]);
-    setQuizSubmitted(false);
-    setScore(null);
-  }, [quiz]);
-
   return (
     <main className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <h1 className="text-4xl font-bold">PDF Quiz Generator</h1>
@@ -154,70 +121,16 @@ export default function Home() {
         )}
         {pdfText && !quiz && (
           <>
-            <div className="mt-4 p-2 border rounded bg-gray-50 max-w-xl max-h-60 overflow-auto text-xs whitespace-pre-wrap">
-              <strong>Extracted Text:</strong>
-              <div>{pdfText}</div>
-            </div>
-            <Button
-              className="w-full max-w-xs mt-4"
+            <ExtractedText text={pdfText} />
+            <GenerateQuizButton
+              loading={quizLoading}
               onClick={handleGenerateQuiz}
-              disabled={quizLoading}
-              aria-busy={quizLoading}
-            >
-              {quizLoading ? "Generating Quiz..." : "Generate Quiz"}
-            </Button>
-            {quizError && (
-              <div className="mt-2 p-2 border border-red-300 rounded bg-red-50 text-red-700 max-w-xl w-full text-xs" role="alert">
-                <strong>Error:</strong> {quizError}
-              </div>
-            )}
+              error={quizError}
+            />
           </>
         )}
         {quiz && (
-          <div className="mt-6 w-full max-w-xl">
-            <h2 className="text-2xl font-semibold mb-4">Quiz</h2>
-            {quiz.map((q, idx) => (
-              <div key={idx} className="mb-6 p-4 border rounded bg-white">
-                <div className="font-medium mb-2">{idx + 1}. {q.question}</div>
-                <ul className="space-y-2">
-                  {q.options.map((opt: string, oidx: number) => {
-                    const isSelected = userAnswers[idx] === opt;
-                    const isCorrect = quizSubmitted && opt === q.answer;
-                    const isIncorrect = quizSubmitted && isSelected && opt !== q.answer;
-                    return (
-                      <li key={oidx} className="pl-2">
-                        <label className={`flex items-center gap-2 cursor-pointer ${isCorrect ? 'text-green-700 font-semibold' : ''} ${isIncorrect ? 'text-red-700 font-semibold' : ''}`}> 
-                          <input
-                            type="radio"
-                            name={`question-${idx}`}
-                            value={opt}
-                            checked={isSelected}
-                            disabled={quizSubmitted}
-                            onChange={() => handleSelectAnswer(idx, opt)}
-                          />
-                          {String.fromCharCode(65 + oidx)}. {opt}
-                        </label>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            ))}
-            {!quizSubmitted && (
-              <Button
-                className="w-full max-w-xs mt-2"
-                onClick={handleSubmitQuiz}
-                disabled={userAnswers.length !== quiz.length || userAnswers.some(ans => !ans)}
-              >
-                Submit Quiz
-              </Button>
-            )}
-            {quizSubmitted && score !== null && (
-              <div className="mt-4 p-4 border rounded bg-blue-50 text-blue-900 text-lg font-semibold text-center">
-                Your Score: {score} / {quiz.length}
-              </div>
-            )}
-          </div>
+          <QuizContainer quiz={quiz as QuizQuestion[]} />
         )}
       </section>
     </main>
