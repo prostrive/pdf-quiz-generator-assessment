@@ -2,9 +2,10 @@
 
 import React, { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import QuizContainer, { QuizQuestion } from "@/components/QuizContainer";
+import QuizContainer from "@/components/QuizContainer";
 import ExtractedText from "@/components/ExtractedText";
 import GenerateQuizButton from "@/components/GenerateQuizButton";
+import type { QuizQuestion } from "@/types/quiz";
 
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);

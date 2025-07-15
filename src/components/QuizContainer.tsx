@@ -1,12 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import QuizQuestionBlock from "@/components/QuizQuestionBlock";
-
-export type QuizQuestion = {
-  question: string;
-  options: string[];
-  answer: string;
-};
+import type { QuizQuestion } from "@/types/quiz";
 
 type QuizContainerProps = {
   quiz: QuizQuestion[];

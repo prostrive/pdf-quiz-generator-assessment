@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import type { QuizQuestion } from '@/types/quiz';
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,7 +10,7 @@ export async function POST(req: NextRequest) {
 
     // MOCK: Return static quiz if MOCK_OPENAI is set
     if (process.env.MOCK_OPENAI === 'true') {
-      const quiz = [
+      const quiz: QuizQuestion[] = [
         {
           question: 'What is the largest planet in the Solar System?',
           options: ['Earth', 'Mars', 'Jupiter', 'Venus'],

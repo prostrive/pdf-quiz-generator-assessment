@@ -1,10 +1,5 @@
 import React from "react";
-
-type QuizQuestion = {
-  question: string;
-  options: string[];
-  answer: string;
-};
+import type { QuizQuestion } from "@/types/quiz";
 
 type QuizQuestionBlockProps = {
   q: QuizQuestion;
