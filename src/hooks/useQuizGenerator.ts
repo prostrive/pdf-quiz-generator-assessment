@@ -30,5 +30,11 @@ export function useQuizGenerator() {
     }
   };
 
-  return { generateQuiz, quiz, loading, error };
+  const reset = () => {
+    setQuiz(null);
+    setLoading(false);
+    setError("");
+  };
+
+  return { generateQuiz, quiz, loading, error, reset };
 } 

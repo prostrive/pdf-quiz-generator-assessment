@@ -41,5 +41,11 @@ export function usePdfTextExtractor() {
     }
   };
 
-  return { extractText, loading, error, text };
+  const reset = () => {
+    setLoading(false);
+    setError("");
+    setText("");
+  };
+
+  return { extractText, loading, error, text, reset };
 } 
