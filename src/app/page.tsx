@@ -6,6 +6,8 @@ import QuizContainer from "@/components/QuizContainer";
 import ExtractedText from "@/components/ExtractedText";
 import GenerateQuizButton from "@/components/GenerateQuizButton";
 import FileUpload from "@/components/FileUpload";
+import ErrorAlert from "@/components/ErrorAlert";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { usePdfTextExtractor } from "@/hooks/usePdfTextExtractor";
 import { useQuizGenerator } from "@/hooks/useQuizGenerator";
 
@@ -36,11 +38,8 @@ export default function Home() {
           {loading ? "Extracting..." : "Upload PDF"}
         </Button>
         {selectedFile && <p className="text-sm text-gray-600">Selected: {selectedFile.name}</p>}
-        {error && (
-          <div className="mt-2 p-2 border border-red-300 rounded bg-red-50 text-red-700 max-w-xl w-full text-xs" role="alert">
-            <strong>Error:</strong> {error}
-          </div>
-        )}
+        {loading && <LoadingSpinner className="my-4" />}
+        {error && <ErrorAlert message={error} />}
         {pdfText && !quiz && (
           <>
             <ExtractedText text={pdfText} />
