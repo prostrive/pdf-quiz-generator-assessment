@@ -1,6 +1,6 @@
 'use client';
 
-import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/build/pdf';
+import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/webpack';
 
 export async function parsePdf(file: File): Promise<{
     success: boolean;
