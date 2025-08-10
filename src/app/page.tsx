@@ -1,9 +1,16 @@
-import { Button } from "@/components/ui/button";
+"use client";
+
+import QuizGenerator from "@/components/quiz-generator/QuizGenerator";
+import Quiz from "@/components/quiz/Quiz";
+import { Questions } from "@/types";
+import { useState } from "react";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-     <h1 className="text-4xl font-bold">PDF Quiz Generator</h1>
-    </div>
+  const [questions, setQuestions] = useState<Questions | null>(null);
+
+  return questions ? (
+    <Quiz questions={questions} setQuestions={setQuestions} />
+  ) : (
+    <QuizGenerator setQuestions={setQuestions} />
   );
 }

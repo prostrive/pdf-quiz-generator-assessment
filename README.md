@@ -1,47 +1,59 @@
 # PDF Quiz Generator - Take-Home Assignment
 
-## Challenge Overview
-Create a simple web application that allows users to upload PDF documents and generate a quiz based on the content using OpenAI.
+## Installation and Setup Instructions
 
-## Tech Stack
-This starter project uses Next.js with Tailwind CSS and Shadcn UI components.
+- Clone the repository https://github.com/berniesonsahagun/pdf-quiz-generator-assessment.
+- Install the dependencies by typing `npm install` on the terminal.
+- Create your account on https://platform.openai.com/ and generate an API Key.
+- Add the API key to a `.env.local` file. See `.env.local.example` for more details.
+- Run the project by typing `npm run dev` on the terminal.
 
-## Core Requirements
+## Additional Libraries and/or Tools Added
 
-### Minimum Viable Product
-- Upload interface for PDF documents (limit to small files, <10 pages)
-- Generate 5 multiple-choice questions using OpenAI based on PDF content
-- Allow users to answer questions and see their score
+Added [Natural](https://github.com/NaturalNode/natural) to preprocess the PDF before making a request to OpenAI.
 
-### Stretch Goals (if time permits)
-- Support for larger documents
-- Short-answer question types
-- Improved error handling
-- Enhanced visual design
+## Approach and Design Decisions
 
-## Implementation Guidelines
-- Focus on creating a working prototype rather than a polished product
-- Use the OpenAI API efficiently (consider extracting key sections rather than sending the entire document)
-- Basic error handling for common cases (invalid PDFs, API failures)
-- Keep the UI simple and functional
+My approach on this assessment is to create the user flow and user interface first when answering the quiz, and when uploading the file to the application. After the user flow is established, I decided on the data structure of the questions object. I decided that the Questions object look like this
+
+```
+[
+    {
+        "question": string,
+        "choices": Array<string>,
+        "answer": number
+    }
+]
+
+Question: This is the question text.
+Choices: This is an array of choices generated.
+Answer: This is the index of the correct answer on the Choices array.
+```
+
+Next, I tested each feature like uploading File, parsing the text on the PDF file, and then using OpenAI API. At this point, the features are now tested and the code is already written. I started integrating each feature with each other, adding error handlings, toasts for user experience and notifications, and lastly refactored the code by code splitting.
+
+## Known Limitations or Areas for Improvement
+
+### The application can only generate multiple choice questions.
+
+- We can improve the application by allowing the AI to generate text-based questions. However, the difficulty of scoring the quiz will rise up. We can delegate the scoring to the AI too if that happens.
+
+### The application does not store anything. The questions generated and answers submitted are not stored nor cached.
+
+- This means that the generated quiz is not saved and will be gone when the window is closed.
+- We can address this by adding client-side persistence like storing on the browser localStorage. This is a quick-solution and not a complete one since not every quiz can be stored inside the localStorage.
+- Another solution is to create a database linked to their accounts. In this way, we can build a full application the would offer backtracking to previous quizzes as well as their solutions.
+
+### The application cannot process images from the PDF.
+
+- Information from images inside the PDF are not included in the generation of quizzes.
+- To address this, we can include the images to the data that we send to OpenAI API. However, cost would be an issue as it is costly to send and process images.
 
 ## Resources
+
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 - [Shadcn UI Documentation](https://ui.shadcn.com)
 - [OpenAI API Documentation](https://platform.openai.com/docs/api-reference)
-- [PDF.js Library](https://mozilla.github.io/pdf.js/) (suggestion for PDF processing)
-
-## Evaluation Criteria
-- Functional completeness of the core features
-- Code organization and clarity
-- Thoughtful API integration
-- Basic user experience considerations
-
-## Timeline
-- Expected completion: 2-3 hours of focused development
-- Deadline: Within 5 days of receiving this assignment
-
-This assignment is designed to demonstrate your approach to problem-solving and integration rather than creating a production-ready application. We're interested in seeing your programming style and how you tackle the essential requirements within the time constraint.
-
-Good luck! We're excited to see your implementation.
+- [PDF.js Library](https://mozilla.github.io/pdf.js/)
+- [Natural](https://github.com/NaturalNode/natural)
