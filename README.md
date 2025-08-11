@@ -1,47 +1,60 @@
-# PDF Quiz Generator - Take-Home Assignment
+# PDF Quiz Generator
 
-## Challenge Overview
-Create a simple web application that allows users to upload PDF documents and generate a quiz based on the content using OpenAI.
+A Next.js + React project styled with Tailwind CSS and shadcn UI components.  
+Users can upload a PDF, and the app generates a quiz based on the PDF content using the OpenAI API.
+
+---
+
+## Features
+
+- Upload PDF files with PDF.js
+- Extract content from PDF
+- Generate quiz questions based on the extracted content using OpenAI API (mocked in development)
+- Clean UI built with Tailwind CSS and shadcn UI components
+- Fast development experience with Next.js
+
+---
 
 ## Tech Stack
-This starter project uses Next.js with Tailwind CSS and Shadcn UI components.
 
-## Core Requirements
+- **Next.js** (React framework)  
+- **Tailwind CSS** (utility-first CSS)  
+- **shadcn UI** (component library)  
+- **OpenAI API** (for generating quiz questions)  
+- **PDF.js** (for rendering and parsing PDFs)  
 
-### Minimum Viable Product
-- Upload interface for PDF documents (limit to small files, <10 pages)
-- Generate 5 multiple-choice questions using OpenAI based on PDF content
-- Allow users to answer questions and see their score
+---
 
-### Stretch Goals (if time permits)
-- Support for larger documents
-- Short-answer question types
-- Improved error handling
-- Enhanced visual design
+## Getting Started
 
-## Implementation Guidelines
-- Focus on creating a working prototype rather than a polished product
-- Use the OpenAI API efficiently (consider extracting key sections rather than sending the entire document)
-- Basic error handling for common cases (invalid PDFs, API failures)
-- Keep the UI simple and functional
+### Prerequisites
 
-## Resources
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-- [Shadcn UI Documentation](https://ui.shadcn.com)
-- [OpenAI API Documentation](https://platform.openai.com/docs/api-reference)
-- [PDF.js Library](https://mozilla.github.io/pdf.js/) (suggestion for PDF processing)
+- Node.js installed (recommended version 16+)  
+- npm or yarn package manager  
 
-## Evaluation Criteria
-- Functional completeness of the core features
-- Code organization and clarity
-- Thoughtful API integration
-- Basic user experience considerations
+### Installation
 
-## Timeline
-- Expected completion: 2-3 hours of focused development
-- Deadline: Within 5 days of receiving this assignment
+```bash
+npm install
+```
 
-This assignment is designed to demonstrate your approach to problem-solving and integration rather than creating a production-ready application. We're interested in seeing your programming style and how you tackle the essential requirements within the time constraint.
+### Running Dev server
 
-Good luck! We're excited to see your implementation.
+```bash
+npm run dev
+```
+
+Open http://localhost:3000 to view the app.
+
+Usage
+Upload a PDF file using the uploader.
+
+-The app extracts text content from the PDF using PDF.js.
+-The extracted content is sent to the OpenAI API to generate quiz questions.
+-The generated quiz is displayed on the UI for user interaction.
+
+Challenges
+OpenAI API Billing: The OpenAI API requires billing details and no free credits were available during development.
+Solution: The OpenAI API calls were mocked with static data to simulate quiz generation.
+
+
