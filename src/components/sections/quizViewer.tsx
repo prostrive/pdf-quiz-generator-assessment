@@ -23,6 +23,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import QuizResultDialog from "./quizResultDialog";
 import { quizAnswerValidator } from "@/lib/validators/quizAnswer.validator";
 import { toast } from "sonner";
+import { QuizDetails, QuizType } from "@/lib/types/quizDetails.type";
+import { Input } from "../ui/input";
 
 type QuizViewerProps = {
   quizQuestions: QuizDetails[];
@@ -44,87 +46,100 @@ export default function QuizViewer({ quizQuestions }: QuizViewerProps) {
     });
 
     const onSubmitQuiz = (values: z.infer<typeof QuizAnswer>): void => {
-        try {
-            setIsLoading(true);
-            let calculatedScore: number= 0;
+      try {
+        setIsLoading(true);
+        let calculatedScore: number = 0;
 
-            quizQuestions.forEach((question) => {
-            const userAnswerIndex: number = parseInt(values[question.id.toString()], 10);
-            if (userAnswerIndex === question.answer) {
-                calculatedScore++;
+        quizQuestions.forEach((question) => {
+          const userAnswer = values[question.id.toString()];
+
+          if (question.type === QuizType.MULTIPLE_CHOICE) {
+            const userIndex = parseInt(userAnswer, 10);
+            if (userIndex === question.answer) calculatedScore++;
+          } else if (question.type === QuizType.SHORT_ANSWER) {
+            if (userAnswer.trim() === (question.answer as string).trim()) {
+              calculatedScore++;
             }
-            });
+          }
+        });
 
-            setTotalScore(calculatedScore);
-            setDialogOpen(true);
-            
-            toast.success('Quiz submitted successfully!');
-        } catch (error) {
-            console.error("Error calculating score: ", error);
-            toast.error('Failed to submit quiz. Please try again.');
-        } finally {
-            setIsLoading(false);
-        }
+        setTotalScore(calculatedScore);
+        setDialogOpen(true);
+        toast.success("Quiz submitted successfully!");
+      } catch (error) {
+        console.error("Error calculating score: ", error);
+        toast.error("Failed to submit quiz. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     if (quizQuestions.length === 0) return null;
 
-  return (
-    <div className="max-w-2xl mx-auto p-6">
-      <h1 className="font-bold text-2xl mb-6">
-        Let’s Put Your Knowledge to the Test
-      </h1>
+    return (
+      <div className="max-w-2xl mx-auto p-6">
+        <h1 className="font-bold text-2xl mb-6">
+          Let’s Put Your Knowledge to the Test
+        </h1>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmitQuiz)} className="space-y-6">
-          {quizQuestions.map((question) => (
-            <FormField
-              key={question.id}
-              control={form.control}
-              name={question.id.toString()}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="font-medium">
-                    {question.id}. {question.question}
-                  </FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      disabled={isLoading}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select your answer" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {question.options.map((option, index) => (
-                          <SelectItem key={index} value={index.toString()}>
-                            {option}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          ))}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmitQuiz)} className="space-y-6">
+            {quizQuestions.map((question) => (
+              <FormField
+                key={question.id}
+                control={form.control}
+                name={question.id.toString()}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-medium">
+                      {question.id}. {question.question}
+                    </FormLabel>
+                    <FormControl>
+                      {question.type === QuizType.MULTIPLE_CHOICE ? (
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          disabled={isLoading}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select your answer" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {question.options.map((option, index) => (
+                              <SelectItem key={index} value={index.toString()}>
+                                {option}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <Input
+                          placeholder="Type your answer"
+                          disabled={isLoading}
+                          {...field}
+                        />
+                      )}
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ))}
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            Submit
-          </Button>
-        </form>
-      </Form>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              Submit
+            </Button>
+          </form>
+        </Form>
 
-      {totalScore !== null && (
-        <QuizResultDialog
-          totalScore={totalScore}
-          totalQuestions={quizQuestions.length}
-          openDialog={dialogOpen}
-          onClose={() => setDialogOpen(false)}
-        />
-      )}
-    </div>
-  );
+        {totalScore !== null && (
+          <QuizResultDialog
+            totalScore={totalScore}
+            totalQuestions={quizQuestions.length}
+            openDialog={dialogOpen}
+            onClose={() => setDialogOpen(false)}
+          />
+        )}
+      </div>
+    );
 }
