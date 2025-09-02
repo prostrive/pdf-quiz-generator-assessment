@@ -55,38 +55,43 @@ export default function PDFUploadForm({
     }
 
     return (
-        <Form {...form}>
-            <form
-                onSubmit={form.handleSubmit(handleUploadPDF, (error) => {
-                    if (error.pdf) {
-                        toast.error(error.pdf.message as string);
-                    }
-                })}
-                className="w-2/3 flex items-end space-x-4"
-            >
-                <FormField
-                    control={form.control}
-                    name="pdf"
-                    render={({ field }) => (
-                        <FormItem className="flex-1">
-                        <FormLabel>Upload PDF File</FormLabel>
-                        <FormControl>
-                            <Input
-                            placeholder="Select PDF File"
-                            ref={inputFileRef}
-                            type="file"
-                            accept="application/pdf"
-                            onChange={(event) => {
-                                const file = event.target.files?.[0] || null;
-                                field.onChange(file);
-                            }}
-                            disabled={isLoading}
-                            />
-                        </FormControl>
-                        </FormItem>
-                    )}
-                />
-                <Button type="submit" disabled={isLoading} className="w-1/3">
+        <div className="max-w-2xl mx-auto p-6">
+            <Form {...form}>
+                <form
+                    onSubmit={form.handleSubmit(handleUploadPDF, (error) => {
+                        if (error.pdf) {
+                            toast.error(error.pdf.message as string);
+                        }
+                    })}
+                    className="w-full flex flex-col gap-4"
+                >
+                    <FormField
+                        control={form.control}
+                        name="pdf"
+                        render={({ field }) => (
+                            <FormItem className="flex-1">
+                            <FormLabel>Upload PDF File</FormLabel>
+                            <FormControl>
+                                <Input
+                                placeholder="Select PDF File"
+                                ref={inputFileRef}
+                                type="file"
+                                accept="application/pdf"
+                                onChange={(event) => {
+                                    const file = event.target.files?.[0] || null;
+                                    field.onChange(file);
+                                }}
+                                disabled={isLoading}
+                                />
+                            </FormControl>
+                            </FormItem>
+                        )}
+                    />
+                    <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full"
+                    >
                     {isLoading ? (
                         <span className="flex items-center">
                         <Loader className="w-4 h-4 animate-spin mr-2" />
@@ -95,8 +100,9 @@ export default function PDFUploadForm({
                     ) : (
                         "Generate Quiz"
                     )}
-                </Button>
-            </form>
-        </Form>
+                    </Button>
+                </form>
+            </Form>
+        </div>
     )
 }
