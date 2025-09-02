@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -44,6 +44,17 @@ export default function QuizViewer({ quizQuestions }: QuizViewerProps) {
         {} as Record<string, string>
         ),
     });
+
+    useEffect(() => {
+      form.reset(
+        quizQuestions.reduce(
+          (acc, question) => ({ ...acc, [question.id]: "" }),
+          {} as Record<string, string>
+        )
+      );
+      setTotalScore(null);
+      setDialogOpen(false);
+    }, [quizQuestions]);
 
     const onSubmitQuiz = (values: z.infer<typeof QuizAnswer>): void => {
       try {

@@ -81,6 +81,8 @@ export default function PDFUploadForm({
                                 onChange={(event) => {
                                     const file = event.target.files?.[0] || null;
                                     field.onChange(file);
+
+                                    quizDetails([]);
                                 }}
                                 disabled={isLoading}
                                 />
