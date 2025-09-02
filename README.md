@@ -1,47 +1,39 @@
-# PDF Quiz Generator - Take-Home Assignment
+# Andre Lagsac: PDF Quiz Generator - Take-Home Assignment
 
-## Challenge Overview
-Create a simple web application that allows users to upload PDF documents and generate a quiz based on the content using OpenAI.
+## Prerequisites
+- Node.js (v22.14.0 or higher)
+- npm (v10.9.2 or higher)
+- OpenAI API Key (non-free tier)
 
-## Tech Stack
-This starter project uses Next.js with Tailwind CSS and Shadcn UI components.
+## Installation Steps
+1. **Setup Environment Variables**
+Create a .env file on root folder of the project and add the following variable:
+OPENAI_API_KEY=<OPENAI_API_KEY>
+2. **Install Node Dependencies:**
+```bash
+npm install
+```
 
-## Core Requirements
+## Run the Website
+1. **Start the Development Server**
+```bash
+npm run dev
+```
+2. **Open in your browser**
+Visit http://localhost:3000 to see the website in action.
 
-### Minimum Viable Product
-- Upload interface for PDF documents (limit to small files, <10 pages)
-- Generate 5 multiple-choice questions using OpenAI based on PDF content
-- Allow users to answer questions and see their score
+## Architecture & Best Practices
 
-### Stretch Goals (if time permits)
-- Support for larger documents
-- Short-answer question types
-- Improved error handling
-- Enhanced visual design
+### Modular Architecture
+- **API Routes:** The OpenAI query is handled on a Next.js API route to keep sensitive logic server-side.
+- **Component Separation:** Components are focused and singular, promoting reusability and maintainability.
+- **Types Directory:** All TypeScript types are organized in a dedicated `types` folder for better structure.
+- **Services Folder:** API and client-side logic are separated into a `services` folder to keep business logic organized.
 
-## Implementation Guidelines
-- Focus on creating a working prototype rather than a polished product
-- Use the OpenAI API efficiently (consider extracting key sections rather than sending the entire document)
-- Basic error handling for common cases (invalid PDFs, API failures)
-- Keep the UI simple and functional
+### Type Safety
+- **Zod Validation:** Forms and input data are validated using Zod to ensure correctness.
+- **TypeScript:** All variables and function signatures are typed for safer code and better developer experience.
 
-## Resources
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-- [Shadcn UI Documentation](https://ui.shadcn.com)
-- [OpenAI API Documentation](https://platform.openai.com/docs/api-reference)
-- [PDF.js Library](https://mozilla.github.io/pdf.js/) (suggestion for PDF processing)
-
-## Evaluation Criteria
-- Functional completeness of the core features
-- Code organization and clarity
-- Thoughtful API integration
-- Basic user experience considerations
-
-## Timeline
-- Expected completion: 2-3 hours of focused development
-- Deadline: Within 5 days of receiving this assignment
-
-This assignment is designed to demonstrate your approach to problem-solving and integration rather than creating a production-ready application. We're interested in seeing your programming style and how you tackle the essential requirements within the time constraint.
-
-Good luck! We're excited to see your implementation.
+### Error Handling
+- **Try/Catch Blocks:** All event functions use `try/catch` to handle errors gracefully.
+- **User Feedback:** Errors are displayed to users via toast notifications for immediate feedback.
