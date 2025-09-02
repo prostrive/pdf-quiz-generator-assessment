@@ -117,6 +117,7 @@ export default function QuizViewer({ quizQuestions }: QuizViewerProps) {
                           placeholder="Type your answer"
                           disabled={isLoading}
                           {...field}
+                          value={field.value ?? ""}
                         />
                       )}
                     </FormControl>

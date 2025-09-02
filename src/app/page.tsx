@@ -2,6 +2,7 @@
 
 import PDFUploadForm from "@/components/sections/pdfUploadForm";
 import QuizViewer from "@/components/sections/quizViewer";
+import { QuizDetails } from "@/lib/types/quizDetails.type";
 import { useState } from "react";
 
 export default function Home() {

@@ -1,3 +1,5 @@
+import { QuizDetails } from "@/lib/types/quizDetails.type";
+
 export async function getQuizDetails(text: string): Promise<QuizDetails[]> {
     const response = await fetch('/api/generate-quiz', {
         method: 'POST',

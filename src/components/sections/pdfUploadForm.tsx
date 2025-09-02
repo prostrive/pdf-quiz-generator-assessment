@@ -13,6 +13,7 @@ import { Loader } from "lucide-react";
 import { parsePDF } from "@/lib/services/client/parsePDF.service";
 import { ParsePDFResponse } from "@/lib/types/pdfDetails.type";
 import { getQuizDetails } from "@/lib/services/client/getQuizDetails.service";
+import { QuizDetails } from "@/lib/types/quizDetails.type";
 
 type PDFUploadFormProps = {
     quizDetails: (quizDetails: QuizDetails[]) => void;
