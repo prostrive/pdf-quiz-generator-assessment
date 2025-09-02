@@ -37,12 +37,17 @@ export async function generateQuizFromText(text: string): Promise<QuizDetails[]>
         messages: [
             { role: 'system', content: 'You are a helpful assistant that generates quiz questions based on provided text.' },
             { role: 'user', content: prompt }
-        ]
+        ],
+        response_format: { type: 'text' }
     })
 
-    if (!completion.choices?.[0]?.message?.content) {
+    let rawContent = completion?.choices[0]?.message?.content?.trim() ?? "";
+
+    if (!rawContent) {
         throw new Error("No response from AI model.");
     }
 
-    return JSON.parse(completion.choices[0].message.content);
+    rawContent = rawContent.replace(/^```json\s*/i, "").replace(/```$/i, "").trim();
+
+    return JSON.parse(rawContent);
 }
