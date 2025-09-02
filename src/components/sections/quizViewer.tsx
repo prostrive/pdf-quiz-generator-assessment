@@ -22,6 +22,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import QuizResultDialog from "./quizResultDialog";
 import { quizAnswerValidator } from "@/lib/validators/quizAnswer.validator";
+import { toast } from "sonner";
 
 type QuizViewerProps = {
   quizQuestions: QuizDetails[];
@@ -29,7 +30,8 @@ type QuizViewerProps = {
 
 export default function QuizViewer({ quizQuestions }: QuizViewerProps) {
     const [totalScore, setTotalScore] = useState<number | null>(null);
-    const [dialogOpen, setDialogOpen] = useState(false);
+    const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const QuizAnswer = quizAnswerValidator(quizQuestions);
 
@@ -41,18 +43,28 @@ export default function QuizViewer({ quizQuestions }: QuizViewerProps) {
         ),
     });
 
-    const onSubmitQuiz = (values: z.infer<typeof QuizAnswer>) => {
-        let calculatedScore = 0;
+    const onSubmitQuiz = (values: z.infer<typeof QuizAnswer>): void => {
+        try {
+            setIsLoading(true);
+            let calculatedScore: number= 0;
 
-        quizQuestions.forEach((q) => {
-        const userAnswerIndex = parseInt(values[q.id.toString()], 10);
-        if (userAnswerIndex === q.answer) {
-            calculatedScore++;
+            quizQuestions.forEach((question) => {
+            const userAnswerIndex: number = parseInt(values[question.id.toString()], 10);
+            if (userAnswerIndex === question.answer) {
+                calculatedScore++;
+            }
+            });
+
+            setTotalScore(calculatedScore);
+            setDialogOpen(true);
+            
+            toast.success('Quiz submitted successfully!');
+        } catch (error) {
+            console.error("Error calculating score: ", error);
+            toast.error('Failed to submit quiz. Please try again.');
+        } finally {
+            setIsLoading(false);
         }
-        });
-
-        setTotalScore(calculatedScore);
-        setDialogOpen(true);
     };
 
     if (quizQuestions.length === 0) return null;
@@ -79,6 +91,7 @@ export default function QuizViewer({ quizQuestions }: QuizViewerProps) {
                     <Select
                       onValueChange={field.onChange}
                       value={field.value}
+                      disabled={isLoading}
                     >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select your answer" />
@@ -98,7 +111,7 @@ export default function QuizViewer({ quizQuestions }: QuizViewerProps) {
             />
           ))}
 
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full" disabled={isLoading}>
             Submit
           </Button>
         </form>
