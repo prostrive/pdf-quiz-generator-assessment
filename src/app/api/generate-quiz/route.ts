@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
         }
 
         return NextResponse.json(
-            { success: true, quizData: quizDetails, message: "Quiz generated successfully." }, 
+            { quizData: quizDetails, message: "Quiz generated successfully." }, 
             { status: 200 }
         );
     } catch (error: any) {
