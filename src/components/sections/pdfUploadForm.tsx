@@ -38,8 +38,16 @@ export default function PDFUploadForm({
             const parsedPDFFile: ParsePDFResponse = await parsePDF(value);
 
             if (!parsedPDFFile.success) {
+                if (parsedPDFFile.message.includes("too many pages")) {
+                    form.setError("pdf", {
+                        type: "manual",
+                        message: parsedPDFFile.message,
+                    });
+                }
                 throw new Error(parsedPDFFile.message);
             }
+
+            form.clearErrors("pdf");
 
             const quizResponse: QuizDetails[] = await getQuizDetails(parsedPDFFile.extractedText!);
             if (!quizResponse || quizResponse.length === 0) {
@@ -69,7 +77,7 @@ export default function PDFUploadForm({
                     <FormField
                         control={form.control}
                         name="pdf"
-                        render={({ field }) => (
+                        render={({ field, fieldState }) => (
                             <FormItem className="flex-1">
                             <FormLabel>Upload PDF File</FormLabel>
                             <FormControl>
@@ -85,6 +93,7 @@ export default function PDFUploadForm({
                                     quizDetails([]);
                                 }}
                                 disabled={isLoading}
+                                className={fieldState.invalid ? "border-red-500" : ""}
                                 />
                             </FormControl>
                             </FormItem>
