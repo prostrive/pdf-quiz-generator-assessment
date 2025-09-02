@@ -9,7 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@radix-ui/react-slot": "^1.1.2",
+    "@hookform/resolvers": "^5.2.1",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-radio-group": "^1.3.8",
+    "@radix-ui/react-slot": "^1.2.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.482.0",
@@ -19,6 +22,7 @@
     "pdfjs-dist": "^5.4.149",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.62.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7",
